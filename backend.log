@@ -4,3 +4,284 @@ INFO:     Started reloader process [74757] using StatReload
 INFO:     Started server process [74791]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+INFO:     127.0.0.1:49653 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49696 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49755 - "GET /status HTTP/1.1" 200 OK
+Error fetching candles XLP: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:49794 - "GET /history/XLP?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles FTNT: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:49796 - "GET /history/FTNT?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles CCL: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:49798 - "GET /history/CCL?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles VRTX: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:49800 - "GET /history/VRTX?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles WM: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:49794 - "GET /history/WM?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles DG: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:49802 - "GET /history/DG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles KR: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:49803 - "GET /history/KR?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles SCHW: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:49796 - "GET /history/SCHW?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles DOCU: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:49798 - "GET /history/DOCU?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles SQ: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:49800 - "GET /history/SQ?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles O: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:49794 - "GET /history/O?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles XLP: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:49803 - "GET /history/XLP?period=5d&interval=1h HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49802 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49802 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49938 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49984 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50029 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50071 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50115 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50162 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50212 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50259 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50301 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50344 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50430 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50473 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50479 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50479 - "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 Not Found
+Error fetching candles AGG: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:50479 - "GET /history/AGG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles BBY: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:50481 - "GET /history/BBY?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles VWO: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:50479 - "GET /history/VWO?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles MRVL: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:50486 - "GET /history/MRVL?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RSG: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:50487 - "GET /history/RSG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RTX: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:50489 - "GET /history/RTX?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles TMO: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:50490 - "GET /history/TMO?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles VEA: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:50481 - "GET /history/VEA?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles CRM: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:50479 - "GET /history/CRM?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles XLF: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:50486 - "GET /history/XLF?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RSG: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:50489 - "GET /history/RSG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RTX: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:50490 - "GET /history/RTX?period=5d&interval=1h HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50487 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50546 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50546 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50487 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50487 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50546 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50487 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50706 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50713 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50752 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50758 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50796 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50802 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50846 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50852 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50891 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50897 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50936 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50942 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50982 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51029 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51071 - "GET /status HTTP/1.1" 200 OK
+Error fetching candles AGG: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:51091 - "GET /history/AGG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51124 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51166 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51209 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51254 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51256 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51298 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51342 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51387 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51431 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51474 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51518 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51520 - "GET /status HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'market_data.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [74791]
+INFO:     Started server process [77413]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:51568 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51611 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51656 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51701 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51743 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51783 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51789 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51831 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51873 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51930 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51968 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52013 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52057 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52059 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52101 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52164 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52209 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52251 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52293 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52337 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52339 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52337 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52337 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52337 - "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 Not Found
+Error fetching candles AGG (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles BBY (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles MRVL (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RTX (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles TMO (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles AGG (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles BBY (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles MRVL (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RTX (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles TMO (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles AGG (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52337 - "GET /history/AGG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles BBY (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52350 - "GET /history/BBY?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles MRVL (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52358 - "GET /history/MRVL?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles VWO (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles VEA (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52359 - "GET /history/RSG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RTX (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52361 - "GET /history/RTX?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles CRM (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles XLF (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles TMO (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52362 - "GET /history/TMO?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles VWO (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles VEA (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles CRM (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles XLF (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles VWO (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52337 - "GET /history/VWO?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles VEA (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52350 - "GET /history/VEA?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RSG (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RTX (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles CRM (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52358 - "GET /history/CRM?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles XLF (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52359 - "GET /history/XLF?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RSG (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52362 - "GET /history/RSG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RTX (attempt 2): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52361 - "GET /status HTTP/1.1" 200 OK
+Error fetching candles AGG (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles BBY (attempt 1): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52350 - "GET /status HTTP/1.1" 200 OK
+Error fetching candles RTX (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52337 - "GET /history/RTX?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles AGG (attempt 2): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52358 - "POST /sync_positions HTTP/1.1" 200 OK
+Error fetching candles MRVL (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles BBY (attempt 2): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52359 - "POST /sync_positions HTTP/1.1" 200 OK
+Error fetching candles RTX (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles AGG (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52362 - "GET /history/AGG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles MRVL (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles TMO (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RTX (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles BBY (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52361 - "GET /history/BBY?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles TMO (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles MRVL (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52350 - "GET /history/MRVL?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RSG (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52337 - "GET /history/RSG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52362 - "POST /sync_positions HTTP/1.1" 200 OK
+Error fetching candles RTX (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52358 - "GET /history/RTX?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles VWO (attempt 1): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52361 - "GET /status HTTP/1.1" 200 OK
+Error fetching candles TMO (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52359 - "GET /history/TMO?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles VEA (attempt 1): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52350 - "POST /sync_positions HTTP/1.1" 200 OK
+Error fetching candles VWO (attempt 2): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52337 - "POST /sync_positions HTTP/1.1" 200 OK
+Error fetching candles CRM (attempt 1): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52358 - "POST /sync_positions HTTP/1.1" 200 OK
+Error fetching candles XLF (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles VEA (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles CRM (attempt 2): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52359 - "GET /status HTTP/1.1" 200 OK
+Error fetching candles VWO (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52362 - "GET /history/VWO?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles XLF (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RTX (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles AGG (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles VEA (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52361 - "GET /history/VEA?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles CRM (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52350 - "GET /history/CRM?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RTX (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles XLF (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52337 - "GET /history/XLF?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles AGG (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles BBY (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles MRVL (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52358 - "GET /history/RSG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RTX (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52359 - "GET /history/RTX?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles BBY (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles AGG (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52362 - "GET /history/AGG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles MRVL (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RTX (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles TMO (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles VWO (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles BBY (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52361 - "GET /history/BBY?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RTX (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles MRVL (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52350 - "GET /history/MRVL?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles TMO (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles VEA (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles CRM (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles VWO (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52337 - "GET /history/RSG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RTX (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52358 - "GET /history/RTX?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles VEA (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles TMO (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52359 - "GET /history/TMO?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles CRM (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles XLF (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles VWO (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52362 - "GET /history/VWO?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles VEA (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52361 - "GET /history/VEA?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RTX (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles CRM (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52350 - "GET /history/CRM?period=5d&interval=1h HTTP/1.1" 404 Not Found

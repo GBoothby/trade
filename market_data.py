@@ -53,14 +53,21 @@ async def get_stock_price(symbol: str, finnhub_key: str = None):
     return None
 
 async def get_stock_candles(symbol: str, period="1mo", interval="1h"):
-    try:
-        # Use cached session for historical data to avoid rate limits
-        ticker = yf.Ticker(symbol, session=cached_session)
-        df = ticker.history(period=period, interval=interval)
-        return df
-    except Exception as e:
-        print(f"Error fetching candles {symbol}: {e}")
-        return pd.DataFrame()
+    # Retry with backoff to handle Yahoo rate limiting
+    for attempt in range(3):
+        try:
+            ticker = yf.Ticker(symbol, session=cached_session)
+            df = ticker.history(period=period, interval=interval)
+            if not df.empty:
+                return df
+            # Empty df might mean rate limited, retry after delay
+            if attempt < 2:
+                await asyncio.sleep(2 * (attempt + 1))
+        except Exception as e:
+            print(f"Error fetching candles {symbol} (attempt {attempt+1}): {e}")
+            if attempt < 2:
+                await asyncio.sleep(2 * (attempt + 1))
+    return pd.DataFrame()
 
 # Crypto (Binance public)
 exchange = ccxt.binance()

@@ -2798,32 +2798,37 @@
         ctx.setLineDash([]);
       }
 
-      // 2. Draw Bars (Difference from Baseline)
-      // We'll use a semi-transparent fill
-      dataSlice.forEach(p => {
-        const x = getX(p.t);
-        const y = getY(p.v);
-        const barWidth = w / 180; // approximate width for 1s ticks in 3m window? 
-        // Actually, points might vary. Let's use a fixed logic or path.
-        // "Bar chart blocks" -> Let's draw a vertical line or rect for each point
-        // But points are dense. Let's draw an Area fill instead? 
-        // User said "blocks". Let's try drawing bars if density allows, or just a filled area.
-        // Let's stick to the user's request: "blocks in the positive or negative"
-
-        ctx.fillStyle = p.v >= CAPITAL ? "rgba(0, 227, 150, 0.15)" : "rgba(255, 69, 96, 0.15)";
-
-        // Draw bar from baseline to point
-        if (p.v >= CAPITAL) {
-          ctx.fillRect(x, y, 2, yBase - y);
-        } else {
-          ctx.fillRect(x, yBase, 2, y - yBase);
+      // 2. Draw Filled Area (Difference from Baseline) — much more visible
+      if (dataSlice.length > 1) {
+        // Positive area (above baseline)
+        ctx.beginPath();
+        ctx.moveTo(getX(dataSlice[0].t), yBase);
+        for (const p of dataSlice) {
+          const x = getX(p.t);
+          const y = Math.min(getY(p.v), yBase); // clamp to baseline for positive
+          ctx.lineTo(x, y);
         }
-      });
+        ctx.lineTo(getX(dataSlice[dataSlice.length - 1].t), yBase);
+        ctx.closePath();
+        ctx.fillStyle = "rgba(0, 227, 150, 0.35)";
+        ctx.fill();
 
+        // Negative area (below baseline)
+        ctx.beginPath();
+        ctx.moveTo(getX(dataSlice[0].t), yBase);
+        for (const p of dataSlice) {
+          const x = getX(p.t);
+          const y = Math.max(getY(p.v), yBase); // clamp to baseline for negative
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(getX(dataSlice[dataSlice.length - 1].t), yBase);
+        ctx.closePath();
+        ctx.fillStyle = "rgba(255, 69, 96, 0.35)";
+        ctx.fill();
+      }
 
-      // 3. Draw Smooth Line
+      // 3. Draw Smooth Equity Line (with glow for visibility)
       ctx.beginPath();
-      // Move to first point
       if (dataSlice.length > 0) {
         let p0 = dataSlice[0];
         ctx.moveTo(getX(p0.t), getY(p0.v));
@@ -2835,29 +2840,23 @@
           const yPrev = getY(pPrev.v);
           const xCurr = getX(pCurr.t);
           const yCurr = getY(pCurr.v);
-
-          // Control point (midpoint)
           const cpX = (xPrev + xCurr) / 2;
           const cpY = (yPrev + yCurr) / 2;
-
-          // Quad curve to midpoint using prev point as control? No.
-          // Spline: curve through midpoints.
-          // Start from p0. 
-          // Standard canvas smoothing:
           ctx.quadraticCurveTo(xPrev, yPrev, cpX, cpY);
         }
-        // Connect to last point
         const last = dataSlice[dataSlice.length - 1];
         ctx.lineTo(getX(last.t), getY(last.v));
-
-        // Extend to 'now'
         ctx.lineTo(getX(now), getY(last.v));
       }
 
+      // Glow effect
+      ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
+      ctx.shadowBlur = 6;
       ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.5;
       ctx.lineJoin = "round";
       ctx.stroke();
+      ctx.shadowBlur = 0;
 
       // 4. Stats Text
       if (dataSlice.length > 0) {
