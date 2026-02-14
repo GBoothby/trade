@@ -604,7 +604,7 @@
     <div style="font-size: 11px; margin-top:20px; color:#8b93b0; text-align:center;">
       Account History (Equity)
     </div>
-    <canvas id="pnlChart" width="600" height="150" style="width:100%; height:80px; margin-top:5px;"></canvas>
+    <canvas id="pnlChart" style="width:100%; height:120px; margin-top:5px;"></canvas>
   </div>
 
   <div id="section-trade" class="section active">
@@ -1019,7 +1019,7 @@
     let running = false;
     let paused = false;
 
-    let CAPITAL = 300;
+    let CAPITAL = 5000;
     let cash = CAPITAL;
     let totalFees = 0;
 
@@ -2725,19 +2725,32 @@
 
     // ---------- Chart Drawing ----------
 
+
+
     function drawPnlChart() {
       const canvas = document.getElementById("pnlChart");
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
-      const w = canvas.width;
-      const h = canvas.height;
+
+      // Match internal resolution to CSS display size (fixes text stretching)
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
 
       ctx.clearRect(0, 0, w, h);
 
+      // Use a fixed Font
+      ctx.font = "12px 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
       if (!equityHistory || equityHistory.length < 2) {
         ctx.fillStyle = "#8b93b0";
-        ctx.font = "10px sans-serif";
-        ctx.fillText("Waiting for more data...", 10, h / 2);
+        ctx.textAlign = "center";
+        ctx.fillText("Waiting for more data...", w / 2, h / 2);
         return;
       }
 
@@ -2751,83 +2764,117 @@
       if (startIndex > 0) startIndex--;
 
       const dataSlice = equityHistory.slice(startIndex);
-      if (dataSlice.length < 2 && equityHistory.length > 2) {
-        // If we have history but nothing in window (flatline), show last point extended
-        // But effectively we need at least 2 points to draw line
-      }
 
-      // Fixed X Range: [now-3m, now]
+      // Time Range
       const minT = cutoff;
       const maxT = now;
 
-      // Y Scaling based on VISIBLE dataSlice
-      let minV = Infinity, maxV = -Infinity;
+      // Value Range: Include CAPITAL (baseline) and all data points
+      let minV = CAPITAL, maxV = CAPITAL;
       for (const p of dataSlice) {
         if (p.v < minV) minV = p.v;
         if (p.v > maxV) maxV = p.v;
       }
-      // Ensure we include CAPITAL/BreakEven in range scaling if close
-      // buffer
-      const rangeV = maxV - minV || 1;
+
+      // Add padding (10%)
+      const rangeV = maxV - minV || 1; // avoid zero range
       minV -= rangeV * 0.1;
       maxV += rangeV * 0.1;
 
       const getX = (t) => ((t - minT) / (maxT - minT)) * w;
       const getY = (v) => h - ((v - minV) / (maxV - minV)) * h;
 
-      // Draw Cumulative Line
-      ctx.beginPath();
-      // If first point is after cutoff, start line from left edge at its value?
-      // Or just draw from point. Let's draw from point.
-      for (let i = 0; i < dataSlice.length; i++) {
-        const x = getX(dataSlice[i].t);
-        const y = getY(dataSlice[i].v);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+      const yBase = getY(CAPITAL);
+
+      // 1. Draw Baseline (All-time Start)
+      if (yBase >= 0 && yBase <= h) {
+        ctx.beginPath();
+        ctx.moveTo(0, yBase);
+        ctx.lineTo(w, yBase);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.setLineDash([]);
       }
-      // Optionally extend to "now" at last known value
-      const last = dataSlice[dataSlice.length - 1];
-      if (last) {
+
+      // 2. Draw Bars (Difference from Baseline)
+      // We'll use a semi-transparent fill
+      dataSlice.forEach(p => {
+        const x = getX(p.t);
+        const y = getY(p.v);
+        const barWidth = w / 180; // approximate width for 1s ticks in 3m window? 
+        // Actually, points might vary. Let's use a fixed logic or path.
+        // "Bar chart blocks" -> Let's draw a vertical line or rect for each point
+        // But points are dense. Let's draw an Area fill instead? 
+        // User said "blocks". Let's try drawing bars if density allows, or just a filled area.
+        // Let's stick to the user's request: "blocks in the positive or negative"
+
+        ctx.fillStyle = p.v >= CAPITAL ? "rgba(0, 227, 150, 0.15)" : "rgba(255, 69, 96, 0.15)";
+
+        // Draw bar from baseline to point
+        if (p.v >= CAPITAL) {
+          ctx.fillRect(x, y, 2, yBase - y);
+        } else {
+          ctx.fillRect(x, yBase, 2, y - yBase);
+        }
+      });
+
+
+      // 3. Draw Smooth Line
+      ctx.beginPath();
+      // Move to first point
+      if (dataSlice.length > 0) {
+        let p0 = dataSlice[0];
+        ctx.moveTo(getX(p0.t), getY(p0.v));
+
+        for (let i = 1; i < dataSlice.length; i++) {
+          const pPrev = dataSlice[i - 1];
+          const pCurr = dataSlice[i];
+          const xPrev = getX(pPrev.t);
+          const yPrev = getY(pPrev.v);
+          const xCurr = getX(pCurr.t);
+          const yCurr = getY(pCurr.v);
+
+          // Control point (midpoint)
+          const cpX = (xPrev + xCurr) / 2;
+          const cpY = (yPrev + yCurr) / 2;
+
+          // Quad curve to midpoint using prev point as control? No.
+          // Spline: curve through midpoints.
+          // Start from p0. 
+          // Standard canvas smoothing:
+          ctx.quadraticCurveTo(xPrev, yPrev, cpX, cpY);
+        }
+        // Connect to last point
+        const last = dataSlice[dataSlice.length - 1];
+        ctx.lineTo(getX(last.t), getY(last.v));
+
+        // Extend to 'now'
         ctx.lineTo(getX(now), getY(last.v));
       }
 
       ctx.strokeStyle = "#fff";
       ctx.lineWidth = 2;
+      ctx.lineJoin = "round";
       ctx.stroke();
 
-      // Break-even line
-      // check if CAPITAL is within view
-      const yBE = getY(CAPITAL);
-      if (yBE >= 0 && yBE <= h) {
-        ctx.beginPath();
-        ctx.moveTo(0, yBE);
-        ctx.lineTo(w, yBE);
-        ctx.strokeStyle = "rgba(255,255,255,0.3)";
-        ctx.setLineDash([4, 4]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
-
-      // Stats Text (Start vs Current)
+      // 4. Stats Text
       if (dataSlice.length > 0) {
-        const startVal = dataSlice[0].v;
-        // Use last point in slice or history
         const curVal = dataSlice[dataSlice.length - 1].v;
-        const diff = curVal - startVal;
-        const pct = startVal !== 0 ? (diff / startVal) * 100 : 0;
+        const diff = curVal - CAPITAL;
+        const pct = CAPITAL !== 0 ? (diff / CAPITAL) * 100 : 0;
         const sign = diff >= 0 ? "+" : "";
 
-        ctx.font = "11px monospace";
+        ctx.font = "12px 'Inter', monospace";
         ctx.fillStyle = "#8b93b0";
         ctx.textAlign = "left";
-        ctx.fillText(`Start: ${fmtMoney(startVal)}`, 5, 15);
+        ctx.fillText(`Start: ${fmtMoney(CAPITAL)}`, 5, 15);
 
         ctx.textAlign = "right";
         ctx.fillStyle = diff >= 0 ? "#00e396" : "#ff4560";
-        // "Now: $305.20 (+$5.20 / +1.73%)"
         const diffText = `(${sign}${fmtMoney(diff)} / ${sign}${pct.toFixed(2)}%)`;
         ctx.fillText(`Now: ${fmtMoney(curVal)} ${diffText}`, w - 5, 15);
-        ctx.textAlign = "left";
       }
 
     }
@@ -2886,11 +2933,18 @@
         const s = await idbGet("settings", "app");
         const cap = Number(s?.value?.initial_capital);
         const hasSession = (Array.isArray(trades) && trades.length > 0) || (positions && Object.keys(positions).length > 0) || (Array.isArray(closedTrades) && closedTrades.length > 0);
+        // If settings has capital, use it. Otherwise use code default 5000.
+        // If state loaded 300 (old default), upgrade it.
+        if (CAPITAL === 300) CAPITAL = 5000;
+
         if (!hasSession && Number.isFinite(cap) && cap > 0) {
           CAPITAL = cap;
           cash = cap;
           const budgetEl = document.getElementById("initialBudget");
           if (budgetEl) budgetEl.value = String(CAPITAL);
+        } else if (!hasSession && CAPITAL === 5000 && cash === 300) {
+          // Upgrade cash too if we just upgraded capital
+          cash = 5000;
         }
       } catch (_e) { }
       // Load botCfg + OpenAI enabled into UI

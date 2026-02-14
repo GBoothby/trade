@@ -5,15 +5,20 @@ import aiohttp
 import asyncio
 
 import os
+import requests_cache
+from datetime import timedelta
 
-# Cache for minimal API calls
+# Cache for minimal API calls (internal)
 _cache = {}
+
+# Cached session for historical data only (avoid rate limits on charts)
+cached_session = requests_cache.CachedSession('yfinance.cache', expire_after=timedelta(minutes=30))
 
 def get_status(provided_key: str = None):
     key = provided_key or os.environ.get("FINNHUB_KEY")
     if key:
         return "Live (Finnhub)"
-    return "Delayed (YFinance)"
+    return "Live (YFinance)"
 
 async def get_stock_price(symbol: str, finnhub_key: str = None):
     # 0. Resolve Key (passed > env)
@@ -22,9 +27,9 @@ async def get_stock_price(symbol: str, finnhub_key: str = None):
     # 1. Try Finnhub if key provided (Real-time IEX data)
     if key:
         try:
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession() as sess:
                 url = f"https://finnhub.io/api/v1/quote?symbol={symbol}&token={key}"
-                async with session.get(url) as resp:
+                async with sess.get(url) as resp:
                     if resp.status == 200:
                         data = await resp.json()
                         price = data.get('c', 0)
@@ -32,11 +37,10 @@ async def get_stock_price(symbol: str, finnhub_key: str = None):
         except Exception as e:
             print(f"Finnhub error {symbol}: {e}")
 
-    # 2. Fallback to yfinance (Delayed ~15m usually, but reliable)
+    # 2. Fallback to yfinance (no cache – fresh prices for scanning)
     try:
         ticker = yf.Ticker(symbol)
         # fast fetch of current price
-        # 'regularMarketPrice' often faster than history
         info = ticker.fast_info
         if info and info.last_price:
              return info.last_price
@@ -50,7 +54,8 @@ async def get_stock_price(symbol: str, finnhub_key: str = None):
 
 async def get_stock_candles(symbol: str, period="1mo", interval="1h"):
     try:
-        ticker = yf.Ticker(symbol)
+        # Use cached session for historical data to avoid rate limits
+        ticker = yf.Ticker(symbol, session=cached_session)
         df = ticker.history(period=period, interval=interval)
         return df
     except Exception as e:

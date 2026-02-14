@@ -8,3 +8,4 @@ python-multipart
 # optional for later
 # pandas_ta
 pandas_ta
+requests-cache
