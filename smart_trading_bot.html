@@ -1,0 +1,3199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Trading Bot</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0e27;
+      color: #fff;
+      padding-bottom: 80px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .status-badges {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge.open {
+      background: rgba(0, 227, 150, 0.3);
+      color: #00e396;
+    }
+
+    .badge.closed {
+      background: rgba(255, 69, 96, 0.3);
+      color: #ff4560;
+    }
+
+    .badge.scanning {
+      background: rgba(255, 193, 7, 0.3);
+      color: #ffc107;
+      animation: pulse 2s infinite;
+    }
+
+    .badge.strategy {
+      background: rgba(138, 43, 226, 0.3);
+      color: #ba68c8;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.6;
+      }
+    }
+
+    .db-status {
+      font-size: 11px;
+      color: #8b93b0;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .db-status.connected {
+      color: #00e396;
+    }
+
+    .db-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #555;
+    }
+
+    .connected .db-dot {
+      background: #00e396;
+      box-shadow: 0 0 4px #00e396;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn.active {
+      background: #00e396;
+      color: #0a0e27;
+    }
+
+    .btn.stop {
+      background: #ff4560;
+    }
+
+    .portfolio {
+      background: #1a1f3a;
+      margin: 16px;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid #667eea;
+    }
+
+    .portfolio-value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .portfolio-value.profit {
+      color: #00e396;
+    }
+
+    .portfolio-value.loss {
+      color: #ff4560;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .stat {
+      background: #0a0e27;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #8b93b0;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section-header {
+      padding: 16px 16px 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #8b93b0;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card {
+      background: #1a1f3a;
+      margin: 0 16px 12px 16px;
+      border-radius: 12px;
+      padding: 16px;
+      border-left: 4px solid #667eea;
+    }
+
+    .card.crypto {
+      border-left-color: #f7931a;
+    }
+
+    .card.forex {
+      border-left-color: #00d4ff;
+    }
+
+    .card.momentum {
+      border-left-color: #00e396;
+    }
+
+    .card.reversal {
+      border-left-color: #ff6b6b;
+    }
+
+    .card.breakout {
+      border-left-color: #ffd93d;
+    }
+
+    .card.win {
+      border-left-color: #00e396;
+    }
+
+    .card.loss {
+      border-left-color: #ff6b6b;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .symbol {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .price {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .price.profit {
+      color: #00e396;
+    }
+
+    .price.loss {
+      color: #ff4560;
+    }
+
+    .details {
+      font-size: 12px;
+      color: #8b93b0;
+      margin-top: 8px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #8b93b0;
+    }
+
+    .market-chip {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .market-chip.us {
+      background: #3b82f6;
+    }
+
+    .market-chip.crypto {
+      background: #f7931a;
+    }
+
+    .market-chip.momentum {
+      background: #00e396;
+    }
+
+    .market-chip.reversal {
+      background: #ff6b6b;
+    }
+
+    .market-chip.breakout {
+      background: #ffd93d;
+      color: #000;
+    }
+
+    .debug {
+      background: #1a1f3a;
+      margin: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 11px;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .debug-line {
+      padding: 2px 0;
+      opacity: 0.8;
+    }
+
+    .log-error {
+      color: #ff6b6b;
+    }
+
+    .log-success {
+      color: #00e396;
+    }
+
+    .log-info {
+      color: #4ecdc4;
+    }
+
+    .log-strategy {
+      color: #ba68c8;
+      font-weight: 600;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1a1f3a;
+      border-top: 2px solid #667eea;
+      display: flex;
+      z-index: 99;
+    }
+
+    .nav-btn {
+      flex: 1;
+      padding: 12px;
+      background: none;
+      border: none;
+      color: #8b93b0;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn.active {
+      color: #667eea;
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .settings-section {
+      padding: 16px;
+    }
+
+    .settings-group {
+      background: #1a1f3a;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .settings-label {
+      font-size: 12px;
+      color: #8b93b0;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .settings-input {
+      width: 100%;
+      background: #0a0e27;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .settings-button {
+      width: 100%;
+      padding: 12px;
+      background: #667eea;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .settings-button.danger {
+      background: #ff4560;
+    }
+
+    .pnl-summary {
+      background: #1a1f3a;
+      margin: 16px;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid #667eea;
+    }
+
+    .pnl-big {
+      font-size: 40px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .pnl-big.profit {
+      color: #00e396;
+    }
+
+    .pnl-big.loss {
+      color: #ff4560;
+    }
+
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 4px 0;
+    }
+
+    .breakdown-label {
+      color: #8b93b0;
+    }
+
+    .breakdown-value {
+      font-weight: 600;
+    }
+
+    /* New Opportunity Card Styles */
+    .opp-card {
+      background: linear-gradient(145deg, #1f2647 0%, #1a1f3a 100%);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .opp-card:active {
+      transform: scale(0.98);
+    }
+
+    .opp-card.high-prob {
+      border-color: #00e396;
+      box-shadow: 0 0 8px rgba(0, 227, 150, 0.1);
+    }
+
+    .opp-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .opp-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-right: 10px;
+      overflow: hidden;
+    }
+
+    .opp-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .opp-info {
+      flex: 1;
+    }
+
+    .opp-name {
+      font-size: 11px;
+      color: #8b93b0;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+
+    .opp-ticker {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .opp-price {
+      font-size: 14px;
+      font-weight: 600;
+      font-family: monospace;
+    }
+
+    .opp-meta {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge.mini {
+      border-radius: 4px;
+      padding: 2px 5px;
+      font-size: 10px;
+    }
+
+    /* Auto-fill grid for dense layout */
+    .cols-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 12px;
+    }
+
+    .opp-card {
+      padding: 10px;
+      /* Tighter padding */
+    }
+
+    .opp-card-header {
+      margin-bottom: 5px;
+    }
+
+    .opp-logo {
+      width: 32px;
+      height: 32px;
+      font-size: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .cols-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>🤖 Smart Trading Bot</h1>
+
+    <div class="subtitle"><span id="appVersion">v??</span> • Fully Automatic • Auto-scanning • Multi-strategy AI</div>
+    <div class="status-badges">
+      <div id="botStatus" class="badge">Bot: Idle</div>
+      <div id="dataSource" class="badge" style="background:rgba(255,255,255,0.1)">Data: Init...</div>
+      <div id="lastScan" class="badge" style="background:rgba(255,255,255,0.1)">Last Scan: --:--:--</div>
+      <div id="strategyStatus" class="badge strategy">Strategy: Python AI</div>
+      <div id="scanStatus" class="badge">Scanner: Active</div>
+    </div>
+    <div class="controls">
+      <button id="btnStart" class="btn active" onclick="startBot()">▶ Start Bot</button>
+      <button id="btnPause" class="btn" onclick="pauseBot()" disabled>⏸ Pause</button>
+      <button id="btnStop" class="btn stop" onclick="stopBot()" disabled>⏹ Stop</button>
+    </div>
+    <div style="font-size: 11px; margin-top:20px; color:#8b93b0; text-align:center;">
+      Account History (Equity)
+    </div>
+    <canvas id="pnlChart" width="600" height="150" style="width:100%; height:80px; margin-top:5px;"></canvas>
+  </div>
+
+  <div id="section-trade" class="section active">
+    <div class="portfolio">
+      <div id="portfolioValue" class="portfolio-value">$300.00</div>
+      <div style="font-size: 12px; color: #8b93b0;">Total Account Value</div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">CASH</div>
+          <div id="cash" class="stat-value">$300.00</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">POSITIONS</div>
+          <div id="posCount" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">P&L</div>
+          <div id="pnl" class="stat-value">$0.00</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">WIN RATE</div>
+          <div id="winRate" class="stat-value">0%</div>
+        </div>
+      </div>
+    </div>
+    <div class="cols-3" style="margin-top:20px;">
+      <div>
+        <div class="section-header">Active Positions <span id="posCount" style="font-size: 11px; opacity: 0.7;">0
+            open</span></div>
+        <div id="positions">
+          <div class="empty">No positions yet</div>
+        </div>
+      </div>
+      <div>
+        <div class="section-header">Live Opportunities <span id="oppCount" style="font-size: 11px; opacity: 0.7;">0
+            found</span></div>
+        <div id="opportunities">
+          <div class="empty">Bot will auto-scan when started</div>
+        </div>
+      </div>
+      <div>
+        <div class="section-header">Recent Trades</div>
+        <div id="trades">
+          <div class="empty">No trades yet</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="section-pnl" class="section">
+    <div class="pnl-summary">
+      <div style="font-size: 12px; color: #8b93b0; margin-bottom: 8px;">NET P&L (After Fees)</div>
+      <div id="pnlBig" class="pnl-big">$0.00</div>
+      <div style="font-size: 14px; color: #8b93b0; margin-top: 4px;">
+        <span id="pnlPercent">0.00%</span> return on <span id="pnlInitial">$300.00</span>
+      </div>
+      <div class="breakdown-grid">
+        <div class="breakdown-item"><span class="breakdown-label">Gross Profit:</span><span id="grossProfit"
+            class="breakdown-value">$0.00</span></div>
+        <div class="breakdown-item"><span class="breakdown-label">Gross Loss:</span><span id="grossLoss"
+            class="breakdown-value">$0.00</span></div>
+        <div class="breakdown-item"><span class="breakdown-label">Total Fees:</span><span id="totalFees"
+            class="breakdown-value">$0.00</span></div>
+        <div class="breakdown-item"><span class="breakdown-label">Avg Trade:</span><span id="avgTrade"
+            class="breakdown-value">$0.00</span></div>
+      </div>
+    </div>
+    <div class="portfolio">
+      <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Performance Metrics</div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">TOTAL TRADES</div>
+          <div id="totalTrades" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">WIN RATE</div>
+          <div id="winRateAnalysis" class="stat-value">0%</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">WINS</div>
+          <div id="winCount" class="stat-value profit">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">LOSSES</div>
+          <div id="lossCount" class="stat-value loss">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">BEST TRADE</div>
+          <div id="bestTrade" class="stat-value profit">$0.00</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">WORST TRADE</div>
+          <div id="worstTrade" class="stat-value loss">$0.00</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">AVG WIN</div>
+          <div id="avgWin" class="stat-value">$0.00</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">AVG LOSS</div>
+          <div id="avgLoss" class="stat-value">$0.00</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-header">Trade History</div>
+    <div id="tradeHistory">
+      <div class="empty">No completed trades yet</div>
+    </div>
+  </div>
+
+  <div id="section-settings" class="section settings-section">
+    <div class="settings-group">
+      <div class="settings-label">💵 Initial Budget</div>
+      <input type="number" id="initialBudget" class="settings-input" value="300" min="100" step="50">
+      <p style="font-size: 11px; color: #8b93b0; margin-top: 6px;">Starting capital. Applied on reset/clear data.</p>
+    </div>
+    <div class="settings-group">
+      <div class="settings-label">💰 Fee Structure</div>
+      <p style="font-size: 12px; color: #8b93b0;"><strong>Buy:</strong> 0.1% | <strong>Sell:</strong> 0.1% |
+        <strong>Round Trip:</strong> 0.2%
+      </p>
+    </div>
+    <div class="settings-group">
+      <div class="settings-label">🤖 Automatic Features</div>
+      <p style="font-size: 12px; color: #8b93b0;"><strong>✅ Auto-Strategy:</strong> Selects best strategy
+        automatically<br><strong>✅ Auto-Scanner:</strong> Scans every 2 minutes when bot active<br><strong>✅ Dynamic
+          Targets:</strong> Adjusts profit/loss based on conditions</p>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-label">📡 Data Source</div>
+      <div style="margin-bottom:8px;">
+        <label><input type="checkbox" id="useLiveData" onchange="saveDataSettings()"> Use Live Data (Finnhub +
+          Binance)</label>
+      </div>
+      <p style="font-size: 11px; color: #8b93b0; margin-bottom: 8px;">
+        Crypto: Free (Binance). Stocks: Finnhub.<br>
+        <strong>Note:</strong> If using a Cloudflare Proxy, you may not need to enter an API key here if it's stored in
+        the worker.
+      </p>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:12px; color:#c7cbe0; margin-bottom:4px;">Finnhub API Key (Optional if Proxy used)</div>
+        <input type="password" id="finnhubApiKey" class="settings-input" placeholder="sandbox_... or real key"
+          onchange="saveDataSettings()">
+      </div>
+      <div>
+        <div style="font-size:12px; color:#c7cbe0; margin-bottom:4px;">Custom Cloudflare/Proxy URL (Optional)</div>
+        <input type="text" id="apiBaseUrl" class="settings-input" placeholder="https://..."
+          onchange="saveDataSettings()">
+      </div>
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button class="settings-button" style="flex:1;" onclick="saveDataSettings()">📡 Save Data Settings</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-label">🧠 OpenAI (optional)</div>
+      <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+        <label style="font-size: 12px; color:#c7cbe0;">
+          <input type="checkbox" id="openaiEnabled" style="transform: translateY(1px);"> Enable OpenAI helpers
+        </label>
+      </div>
+      <p style="font-size: 11px; color: #8b93b0; margin-top: 6px;">
+        Stored locally in encrypted form (AES-GCM). Used only for periodic analysis/regime gating (not per-tick).
+      </p>
+      <input type="password" id="openaiApiKey" class="settings-input" placeholder="OpenAI API key (sk-...)"
+        style="margin-top:8px;">
+      <input type="password" id="openaiPassphrase" class="settings-input"
+        placeholder="Passphrase to encrypt/decrypt key" style="margin-top:8px;">
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button class="settings-button" style="flex:1;" onclick="saveOpenAISettings()">🔐 Save OpenAI Settings</button>
+        <button class="settings-button" style="flex:1;" onclick="openaiSelfTest()">🧪 Test (placeholder)</button>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-label">📈 Smarter Trading Controls</div>
+      <p style="font-size: 11px; color: #8b93b0; margin-top: 6px;">These reduce churn in chop and size positions using
+        volatility (ATR proxy).</p>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:8px;">
+        <div>
+          <div style="font-size:12px; color:#c7cbe0; margin-bottom:4px;">Risk % per trade</div>
+          <input type="number" id="riskPct" class="settings-input" value="0.5" min="0.1" step="0.1">
+        </div>
+        <div>
+          <div style="font-size:12px; color:#c7cbe0; margin-bottom:4px;">Max positions</div>
+          <input type="number" id="maxPositions" class="settings-input" value="8" min="1" step="1">
+        </div>
+        <div>
+          <div style="font-size:12px; color:#c7cbe0; margin-bottom:4px;">Cooldown (mins)</div>
+          <input type="number" id="cooldownMins" class="settings-input" value="20" min="0" step="5">
+        </div>
+        <div>
+          <div style="font-size:12px; color:#c7cbe0; margin-bottom:4px;">Max hold (mins)</div>
+          <input type="number" id="maxHoldMins" class="settings-input" value="120" min="1" step="10">
+        </div>
+        <div>
+          <div style="font-size:12px; color:#c7cbe0; margin-bottom:4px;">ATR stop (x)</div>
+          <input type="number" id="atrStopX" class="settings-input" value="1.4" min="0.5" step="0.1">
+        </div>
+        <div>
+          <div style="font-size:12px; color:#c7cbe0; margin-bottom:4px;">ATR take profit (x)</div>
+          <input type="number" id="atrTpX" class="settings-input" value="2.2" min="0.5" step="0.1">
+        </div>
+        <div>
+          <div style="font-size:12px; color:#c7cbe0; margin-bottom:4px;">Min edge buffer (%)</div>
+          <input type="number" id="edgeBufferPct" class="settings-input" value="0.25" min="0" step="0.05">
+        </div>
+        <div>
+          <div style="font-size:12px; color:#c7cbe0; margin-bottom:4px;">Range band (%)</div>
+          <input type="number" id="rangeBandPct" class="settings-input" value="0.35" min="0.05" step="0.05">
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-label">💾 Data Persistence</div>
+      <div class="db-status connected" id="dbStatus">
+        <span class="status-dot"></span> <span id="dbName">Backend: trades.db (SQLite)</span>
+      </div>
+      <p style="font-size: 11px; color: #8b93b0; margin-top: 6px;">
+        Data is automatically saved to the Python Backend database.
+      </p>
+    </div>
+
+    <button class="settings-button" onclick="saveSettings()">💾 Save Settings</button>
+    <button class="settings-button danger" onclick="clearData()">🗑️ Clear All Data & Reset</button>
+  </div>
+
+
+  <div id="section-debug" class="section">
+    <div class="section-header">Debug & Diagnostics <span style="font-size:11px;color:#8b93b0"
+        id="debugStatusChip">idle</span></div>
+
+    <div class="card" style="margin-top:0">
+      <div class="details" style="margin-top:0">
+        <div><strong>Session:</strong> <span id="dbgSessionId">—</span></div>
+        <div><strong>Bot:</strong> <span id="dbgBotState">stopped</span> • <strong>Last tick:</strong> <span
+            id="dbgLastTick">—</span></div>
+        <div><strong>Quotes:</strong> <span id="dbgQuotesScanned">0</span> scanned • <span id="dbgQuoteOk">0</span> ok
+          •
+          <span id="dbgQuoteErr">0</span> err
+        </div>
+        <div><strong>Trades:</strong> <span id="dbgTradesCount">0</span> total • <span id="dbgClosedCount">0</span>
+          closed • <strong>Fees:</strong> <span id="dbgFees">$0.00</span></div>
+        <div><strong>Equity:</strong> <span id="dbgEquity">$0.00</span> • <strong>Cash:</strong> <span
+            id="dbgCash">$0.00</span> • <strong>Exposure:</strong> <span id="dbgExposure">$0.00</span></div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn" onclick="dbgExportBundle()">⬇️ Export Debug Bundle</button>
+        <button class="btn" onclick="dbgCopySummary()">📋 Copy Summary</button>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="btn" onclick="dbgShowState()">🧾 Show Current State</button>
+        <button class="btn stop" onclick="dbgClearLog()">🧹 Clear Log</button>
+      </div>
+
+      <p style="font-size:11px;color:#8b93b0;margin-top:10px;">
+        Tip: Export bundle after 30–60 minutes running. It includes state, settings, last logs, and snapshots.
+      </p>
+    </div>
+
+    <div class="section-header">Event Log</div>
+    <div id="debugLog" class="debug">
+      <div class="debug-line log-info">Initializing...</div>
+    </div>
+
+    <div class="section-header">Quick Results</div>
+    <div class="card">
+      <div class="details" style="margin-top:0" id="dbgResults">
+        <div style="font-size:11px;color:#8b93b0;">Live Data Status:</div>
+        <div id="dbgLiveStatus" style="font-size:12px;margin-bottom:6px;">Simulation Mode</div>
+        No results yet.
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+
+    <button class="nav-btn active" onclick="showSection('trade')">📊 Trade</button>
+    <button class="nav-btn" onclick="showSection('pnl')">💰 P&L</button>
+    <button class="nav-btn" onclick="showSection('settings')">⚙️ Settings</button>
+    <button class="nav-btn" onclick="showSection('debug')">🔍 Debug</button>
+  </div>
+  <script>
+
+
+    // Smart Trading Bot v37 (logic-only update; UI unchanged)
+
+    // --- UI navigation helpers (required for bottom nav buttons) ---
+    function showSection(sectionName) {
+      // sections are: trade, pnl, settings, debug
+      const sections = ["trade", "pnl", "settings", "debug"];
+      sections.forEach(name => {
+        const el = document.getElementById(`section-${name}`);
+        if (!el) return;
+        if (name === sectionName) el.classList.add("active");
+        else el.classList.remove("active");
+      });
+
+      // bottom nav active state
+      document.querySelectorAll(".bottom-nav .nav-btn").forEach(btn => btn.classList.remove("active"));
+      const map = { trade: 0, pnl: 1, settings: 2, debug: 3 };
+      const idx = map[sectionName];
+      const navBtns = document.querySelectorAll(".bottom-nav .nav-btn");
+      if (idx !== undefined && navBtns[idx]) navBtns[idx].classList.add("active");
+
+      // ensure section-specific panels refresh
+      if (sectionName === "pnl" && typeof updatePnL === "function") updatePnL();
+    }
+
+    // ensure accessible from inline handlers in older browsers
+    window.showSection = showSection;
+
+    const APP_VERSION = "v38";
+    const STORAGE_KEY = "smart_trading_bot_state_v1";
+    const UNIVERSE_KEY = "smart_trading_bot_universe_v1";
+
+    // Timing (ms)
+    const SCAN_INT = 15000;
+    const TRADE_INT = 30000;
+
+    // Fees (simple "MooMoo-like" approximation: per-side brokerage + percent commission)
+    const FEE = {
+      // flat fee per execution (buy or sell)
+      perSideFlat: 0.30,
+      // percentage of notional per execution
+      pct: 0.0008, // 0.08%
+      // minimum fee per execution
+      min: 0.30
+    };
+
+    // Strategy thresholds
+    const STRAT = {
+      momentum: { buyPct: 0.0035, sellStopPct: -0.02, takeProfitPct: 0.03 },
+      meanrevert: { buyPct: -0.0035, sellStopPct: -0.03, takeProfitPct: 0.02 }
+    };
+    // --- Smarter trading config (loaded from Settings / IndexedDB) ---
+    let BOTCFG = {
+      riskPct: 0.005,          // 0.5% of equity risked per trade
+      maxPositions: 8,
+      cooldownMs: 20 * 60 * 1000,
+      maxHoldMs: 120 * 60 * 1000,
+      atrStopX: 1.4,
+      atrTpX: 2.2,
+      edgeBufferPct: 0.0008,   // 0.25% buffer on top of fees/slippage
+      rangeBandPct: 0.0035,    // 0.35% band to treat as range
+      minAtrPct: 0.0003,       // 0.10% min ATR (avoid dead chop)
+      maxAtrPct: 0.1000,       // 5% cap (avoid insane spikes)
+      useLiveData: false,
+      finnhubKey: "",
+      apiBaseUrl: "https://finnhub.io/api/v1"
+    };
+
+    let lastExit = {}; // symbol -> ts (cooldown after closing)
+    let companyNames = {}; // symbol -> {name, logo, industry}
+
+
+    const DEFAULT_POOLS = {
+      // ~300-ish common US tickers (mix of mega-cap + liquid names + ETFs)
+      us: [
+        'AAPL', 'MSFT', 'NVDA', 'AMZN', 'GOOGL', 'GOOG', 'META', 'TSLA', 'BRK-B', 'LLY', 'AVGO', 'JPM', 'V', 'XOM', 'UNH', 'WMT', 'MA', 'PG', 'HD', 'COST',
+        'ABBV', 'MRK', 'NFLX', 'KO', 'PEP', 'ORCL', 'CRM', 'BAC', 'CVX', 'ADBE', 'CSCO', 'TMO', 'WFC', 'ACN', 'ABT', 'MCD', 'LIN', 'INTC', 'AMD', 'DHR',
+        'TXN', 'DIS', 'PM', 'IBM', 'GE', 'CAT', 'INTU', 'AMAT', 'QCOM', 'NOW', 'GS', 'MS', 'BLK', 'SPGI', 'RTX', 'NEE', 'HON', 'LOW', 'UPS', 'SBUX', 'DE',
+        'MDT', 'ISRG', 'AMGN', 'PFE', 'COP', 'BA', 'LMT', 'GILD', 'BKNG', 'NKE', 'T', 'VZ', 'SCHW', 'C', 'AXP', 'USB', 'PNC', 'CB', 'DUK', 'SO', 'AEP',
+        'PLD', 'CCI', 'EQIX', 'SPG', 'O', 'BK', 'MMC', 'ICE', 'ADP', 'MO', 'ELV', 'CI', 'SYK', 'ZTS', 'VRTX', 'REGN', 'BMY', 'MU', 'LRCX', 'KLAC', 'SNPS',
+        'CDNS', 'ANET', 'PANW', 'CRWD', 'FTNT', 'SHOP', 'SQ', 'PYPL', 'UBER', 'LYFT', 'ABNB', 'DASH', 'SNOW', 'DDOG', 'MDB', 'NET', 'TEAM', 'ZS', 'OKTA',
+        'TWLO', 'DOCU', 'PLTR', 'RBLX', 'ROKU', 'SPOT', 'EA', 'TTWO', 'ATVI', 'SONY', 'TSM', 'ASML', 'NXPI', 'ADI', 'ON', 'MRVL', 'ARM', 'SMCI', 'DELL',
+        'HPQ', 'STX', 'WDC', 'FSLR', 'ENPH', 'SEDG', 'NEP', 'TSLA', 'F', 'GM', 'RIVN', 'LCID', 'NIO', 'XPEV', 'LI', 'BYDDF',
+        'NOC', 'GD', 'HII', 'LHX', 'TXT', 'PCAR', 'PH', 'ETN', 'EMR', 'ITW', 'WM', 'RSG', 'FAST', 'GWW', 'CSX', 'NSC', 'UNP', 'DAL', 'AAL', 'UAL', 'LUV',
+        'MAR', 'HLT', 'RCL', 'CCL', 'NCLH', 'CMG', 'YUM', 'DPZ', 'MGM', 'WYNN', 'LVS',
+        'TGT', 'KR', 'DG', 'DLTR', 'ROST', 'TJX', 'BBY', 'ULTA', 'LOW', 'HBI', 'GPS', 'LEN', 'DHI', 'NVR', 'PHM',
+        'CVS', 'WBA', 'CI', 'HCA', 'UHS', 'HUM', 'CNC', 'DXCM', 'IDXX', 'BIIB', 'ALGN',
+        'JNJ', 'KMB', 'CL', 'GIS', 'KHC', 'SYY', 'K', 'MDLZ', 'MNST',
+        'SPY', 'QQQ', 'IWM', 'DIA', 'VTI', 'VOO', 'VEA', 'VWO', 'BND', 'AGG', 'XLK', 'XLF', 'XLE', 'XLV', 'XLY', 'XLP', 'XLI', 'XLC', 'XLU', 'XLRE',
+        'GLD', 'SLV', 'TLT', 'IEF', 'SHY', 'LQD', 'HYG'
+      ],
+      crypto: ['BTC-USD', 'ETH-USD', 'SOL-USD', 'XRP-USD', 'ADA-USD', 'DOGE-USD', 'AVAX-USD', 'DOT-USD', 'MATIC-USD', 'LINK-USD', 'BNB-USD', 'TRX-USD'],
+      forex: ['EURUSD=X', 'GBPUSD=X', 'USDJPY=X', 'AUDUSD=X', 'USDCAD=X', 'NZDUSD=X', 'USDCHF=X']
+    };
+
+    function loadUniverse() {
+      try {
+        const raw = localStorage.getItem(UNIVERSE_KEY);
+        if (!raw) return flattenPools(DEFAULT_POOLS);
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length) return sanitizeSymbols(parsed);
+        if (typeof parsed === "string") return sanitizeSymbols(parsed.split(","));
+      } catch (e) { }
+      return flattenPools(DEFAULT_POOLS);
+    }
+    function flattenPools(pools) {
+      return sanitizeSymbols([...(pools.us || []), ...(pools.crypto || []), ...(pools.forex || [])]);
+    }
+    function sanitizeSymbols(list) {
+      const out = [];
+      const seen = new Set();
+      for (const s of (list || [])) {
+        const sym = String(s || "").trim();
+        if (!sym) continue;
+        if (seen.has(sym)) continue;
+        seen.add(sym);
+        out.push(sym);
+      }
+      return out;
+    }
+
+    let universe = loadUniverse();
+
+    // State
+    let running = false;
+    let paused = false;
+
+    let CAPITAL = 300;
+    let cash = CAPITAL;
+    let totalFees = 0;
+
+    let positions = {}; // symbol -> { qty, avgPrice, feesPaid, lots:[{qty, price, fee, time}] }
+    let trades = [];    // executions (buys + sells)
+    let closedTrades = []; // derived on sell: {symbol, qty, entryPrice, exitPrice, buyFee, sellFee, grossPnl, netPnl, timeIn, timeOut}
+
+    let prices = {};          // symbol -> last price
+    let priceHistory = {};    // symbol -> [{t, p}] (rolling)
+    let opportunities = [];   // scan output
+    let equityHistory = [];   // [{t, v}] for graph (persisted in state)
+
+    let strategy = "momentum";
+
+    let scanTimer = null;
+    let tradeTimer = null;
+
+    // --- Helper for Names ---
+    const getName = (sym) => {
+      const OVERRIDES = {
+        "BTC-USD": "Bitcoin", "ETH-USD": "Ethereum", "SOL-USD": "Solana", "XRP-USD": "XRP",
+        "ADA-USD": "Cardano", "DOGE-USD": "Dogecoin", "AVAX-USD": "Avalanche",
+        "DOT-USD": "Polkadot", "MATIC-USD": "Polygon", "LINK-USD": "Chainlink",
+        "BNB-USD": "Binance Coin", "TRX-USD": "TRON", "LTC-USD": "Litecoin"
+      };
+      if (OVERRIDES[sym]) return OVERRIDES[sym];
+      const meta = companyNames[sym] || {};
+      return meta.name || sym;
+    };
+
+    // --- Trading Logic ---
+    function now() { return Date.now(); }
+
+    function fmtMoney(x) {
+      const n = Number(x || 0);
+      const sign = n < 0 ? "-" : "";
+      return `${sign}$${Math.abs(n).toFixed(2)}`;
+    }
+    function pct(a, b) {
+      if (!b) return 0;
+      return (a / b) * 100;
+    }
+
+    function calcFee(notional) {
+      const n = Math.max(0, Number(notional || 0));
+      const fee = Math.max(FEE.min, FEE.perSideFlat + n * FEE.pct);
+      return fee;
+    }
+
+    function ensurePrice(sym) {
+      if (prices[sym] != null) return;
+      // deterministic-ish base by hashing symbol
+      let h = 0;
+      for (let i = 0; i < sym.length; i++) h = (h * 31 + sym.charCodeAt(i)) >>> 0;
+      const base = 10 + (h % 9000) / 100; // 10..100
+      prices[sym] = base;
+      priceHistory[sym] = [{ t: now(), p: base }];
+    }
+
+    function randomWalk(sym) {
+      ensurePrice(sym);
+      const last = prices[sym];
+      // volatility by asset type
+      const isCrypto = sym.endsWith("-USD") && sym.includes("-");
+      const isFx = sym.endsWith("=X");
+      const vol = isCrypto ? 0.015 : (isFx ? 0.0012 : 0.006);
+      const drift = 0.0001;
+      const shock = (Math.random() - 0.5) * 2 * vol;
+      const next = Math.max(0.01, last * (1 + drift + shock));
+      prices[sym] = next;
+
+      const hist = priceHistory[sym] || (priceHistory[sym] = []);
+      hist.push({ t: now(), p: next });
+      // keep last ~200 points
+      if (hist.length > 200) hist.splice(0, hist.length - 200);
+      return next;
+    }
+
+    // --- Python Backend Integration ---
+    const API_URL = "http://localhost:8000";
+
+    async function fetchQuote(sym) {
+      try {
+        // New Python Flow: Ask backend for analysis (which includes price)
+        let url = `${API_URL}/analyze/${sym}?strategy=${strategy}`;
+        // Pass user's Finnhub key if available to use real-time data on backend
+        if (BOTCFG.finnhubKey) url += `&token=${BOTCFG.finnhubKey}`;
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Backend error");
+        const data = await res.json();
+
+        const price = data.price;
+        if (price) {
+          updatePrice(sym, price);
+          // If backend gives signal, we can store it for the strategy loop
+          // For now, we just updating price to keep UI alive
+          return price;
+        }
+      } catch (e) {
+        // Fallback if backend offline: usage random walk but warn
+        if (Math.random() < 0.05) log("Backend offline? Using simulation.", "warn");
+        return randomWalk(sym);
+      }
+    }
+
+    // Fetch basic profile (Name, Logo)
+    async function fetchProfile(sym) {
+      // Manual overrides for Crypto/Common
+      const OVERRIDES = {
+        "BTC-USD": "Bitcoin", "ETH-USD": "Ethereum", "SOL-USD": "Solana", "XRP-USD": "XRP",
+        "ADA-USD": "Cardano", "DOGE-USD": "Dogecoin", "AVAX-USD": "Avalanche",
+        "DOT-USD": "Polkadot", "MATIC-USD": "Polygon", "LINK-USD": "Chainlink",
+        "BNB-USD": "Binance Coin", "TRX-USD": "TRON", "LTC-USD": "Litecoin"
+      };
+      if (OVERRIDES[sym]) {
+        companyNames[sym] = { name: OVERRIDES[sym], logo: null }; // pending real logo logic
+        return;
+      }
+
+      if (sym.includes("-") || sym.includes("=")) return; // skip other crypto/fx for now
+      try {
+        const baseUrl = (BOTCFG.apiBaseUrl || "https://finnhub.io/api/v1").replace(/\/$/, "");
+        let url = `${baseUrl}/stock/profile2?symbol=${sym}`;
+        if (BOTCFG.finnhubKey) url += `&token=${BOTCFG.finnhubKey}`;
+
+        const res = await fetch(url);
+        if (res.ok) {
+          const d = await res.json();
+          if (d && d.name) {
+            companyNames[sym] = { name: d.name, logo: d.logo, industry: d.finnhubIndustry };
+            saveState(); // persist naming
+          }
+        }
+      } catch (e) { }
+    }
+
+    function updatePrice(sym, price) {
+      prices[sym] = price;
+      const hist = priceHistory[sym] || (priceHistory[sym] = []);
+      hist.push({ t: now(), p: price });
+      if (hist.length > 200) hist.splice(0, hist.length - 200);
+    }
+
+    function getReturnPct(sym, ms = 60000) {
+      const hist = priceHistory[sym];
+      if (!hist || hist.length < 2) return 0;
+      const cutoff = now() - ms;
+      let base = hist[0].p;
+      for (let i = hist.length - 1; i >= 0; i--) {
+        if (hist[i].t <= cutoff) { base = hist[i].p; break; }
+      }
+      const last = hist[hist.length - 1].p;
+      return (last / base) - 1;
+    }
+
+    // --- Indicators (ATR proxy + moving averages) ---
+    function getHist(sym) {
+      const hist = priceHistory[sym];
+      if (!hist || hist.length < 3) return null;
+      return hist;
+    }
+
+    function smaFromHist(hist, n, endIndex = null) {
+      const end = (endIndex == null) ? hist.length - 1 : endIndex;
+      const start = Math.max(0, end - n + 1);
+      const span = end - start + 1;
+      if (span <= 0) return NaN;
+      let s = 0;
+      for (let i = start; i <= end; i++) s += hist[i].p;
+      return s / span;
+    }
+
+    // ATR proxy: average absolute close-to-close return over N bars
+    function atrPctFromHist(hist, n = 30) {
+      const end = hist.length - 1;
+      const start = Math.max(1, end - n + 1);
+      const span = end - start + 1;
+      if (span <= 1) return NaN;
+      let s = 0, k = 0;
+      for (let i = start; i <= end; i++) {
+        const prev = hist[i - 1].p;
+        const cur = hist[i].p;
+        if (prev > 0) {
+          s += Math.abs(cur / prev - 1);
+          k++;
+        }
+      }
+      return k ? (s / k) : NaN;
+    }
+
+    function getIndicators(sym) {
+      const hist = getHist(sym);
+      if (!hist) return null;
+      const p = hist[hist.length - 1].p;
+      const ma20 = smaFromHist(hist, 20);
+      const ma50 = smaFromHist(hist, 50);
+      const ma20_prev = smaFromHist(hist, 20, Math.max(0, hist.length - 6)); // ~5 bars back
+      const slope20 = Number.isFinite(ma20) && Number.isFinite(ma20_prev) ? (ma20 / ma20_prev - 1) : 0;
+      const atrPct = atrPctFromHist(hist, 30);
+      const band = Math.abs(ma20 - ma50) / p;
+
+      let regime = "unknown";
+      if (Number.isFinite(ma20) && Number.isFinite(ma50) && Number.isFinite(atrPct)) {
+        if (band <= BOTCFG.rangeBandPct) regime = "range";
+        else if (ma20 > ma50 && slope20 > 0) regime = "trend_up";
+        else if (ma20 < ma50 && slope20 < 0) regime = "trend_down";
+        else regime = "transition";
+      }
+      return { p, ma20, ma50, slope20, atrPct, band, regime };
+    }
+
+    function minEdgeRequiredPct(notional) {
+      // fees are per execution; require round-trip fees plus buffer
+      const feeRound = 2 * calcFee(notional);
+      const feePct = notional > 0 ? (feeRound / notional) : 0;
+      // add buffer for slippage/noise
+      return feePct + BOTCFG.edgeBufferPct;
+    }
+
+    // --- Debug event capture (bounded) ---
+    let dbgEvents = [];
+    function log(msg, level = "info") {
+      try {
+        const el = document.getElementById("debugLog");
+        const t = new Date().toLocaleTimeString();
+        const entry = { t: Date.now(), ts: t, level, msg: String(msg) };
+        dbgEvents.push(entry);
+        if (dbgEvents.length > 600) dbgEvents.splice(0, dbgEvents.length - 600);
+
+        if (el) {
+          const line = document.createElement("div");
+          line.className = "debug-line " + (
+            level === "error" ? "log-error" :
+              level === "success" ? "log-success" :
+                level === "strategy" ? "log-strategy" : "log-info"
+          );
+          line.textContent = `[${t}] ${msg}`;
+          // prepend
+          el.insertBefore(line, el.firstChild);
+          // keep dom bounded
+          while (el.children.length > 400) el.removeChild(el.lastChild);
+        }
+      } catch (e) { }
+    }
+
+
+    function dbgLog(msg, level = "info") { return log(msg, level); }
+    // Capture runtime errors into Debug log
+    window.addEventListener("error", (ev) => {
+      log(`JS Error: ${ev.message || ev.type}`, "error");
+    });
+    window.addEventListener("unhandledrejection", (ev) => {
+      log(`Unhandled Promise: ${ev.reason?.message || ev.reason || "unknown"}`, "error");
+    });
+
+    // Debug helpers (wired to Debug tab buttons)
+    async function dbgBuildBundle() {
+      const bundle = {
+        exported_at: new Date().toISOString(),
+        app: { version: APP_VERSION, userAgent: navigator.userAgent, href: location.href },
+        storage: { primary: "indexeddb", db: "smart_trading_bot_db_v1" },
+        events_tail: dbgEvents.slice(-400),
+      };
+
+      // Try IndexedDB first; fall back to localStorage blob
+      try {
+        if (typeof indexedDB !== "undefined") {
+          const state = await idbGet("state", "current");
+          const settings = await idbGet("settings", "app");
+          const meta = await idbGet("meta", "migrated_from_localstorage");
+          bundle.indexeddb = { state, settings, meta };
+          bundle.summary = dbgComputeSummary(state);
+          return bundle;
+        }
+      } catch (e) {
+        log(`Export: IndexedDB read failed (${e?.message || e})`, "error");
+      }
+
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const state = raw ? JSON.parse(raw) : null;
+        bundle.localStorage = { [STORAGE_KEY]: state };
+        bundle.summary = dbgComputeSummary(state);
+      } catch (e) {
+        log(`Export: localStorage read failed (${e?.message || e})`, "error");
+      }
+      return bundle;
+    }
+
+    function dbgComputeSummary(state) {
+      try {
+        const trades = (state?.trades || []).filter(t => t && t.side === "SELL" && (t.netPnl ?? t.netPnl === 0));
+        const net = trades.map(t => Number(t.netPnl ?? 0)).filter(n => Number.isFinite(n));
+        const sum = arr => arr.reduce((a, b) => a + b, 0);
+        const avg = arr => arr.length ? sum(arr) / arr.length : 0;
+        const wins = net.filter(x => x > 0);
+        const losses = net.filter(x => x < 0);
+        const winRate = net.length ? wins.length / net.length : 0;
+        const avgWin = avg(wins);
+        const avgLoss = Math.abs(avg(losses));
+        const expectancy = winRate * avgWin - (1 - winRate) * avgLoss;
+        const profitFactor = Math.abs(sum(wins) / (sum(losses) || -1));
+        return {
+          capital: state?.CAPITAL ?? state?.capital,
+          cash: state?.cash,
+          totalFees: state?.totalFees,
+          trades_closed: net.length,
+          winRate,
+          avgWin,
+          avgLoss,
+          expectancy,
+          profitFactor
+        };
+      } catch (e) { return { error: String(e) }; }
+    }
+
+    function dbgDownloadJSON(filename, obj) {
+      const json = JSON.stringify(obj, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 500);
+    }
+
+    async function dbgExportBundle() {
+      const bundle = await dbgBuildBundle();
+      const name = `smart_trading_bot_debug_${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+      try {
+        dbgDownloadJSON(name, bundle);
+        log(`Exported debug bundle (${name})`, "success");
+      } catch (e) {
+        log(`Export failed (${e?.message || e})`, "error");
+        // fallback: show in-page
+        const el = document.getElementById("dbgResults");
+        if (el) el.innerHTML = `<pre style="white-space:pre-wrap;word-break:break-word">${escapeHtml(JSON.stringify(bundle, null, 2))}</pre>`;
+      }
+    }
+
+    async function dbgCopySummary() {
+      const bundle = await dbgBuildBundle();
+      const summary = bundle.summary || {};
+      const lines = [
+        `Smart Trading Bot ${APP_VERSION}`,
+        `Equity: ${document.getElementById("dbgEquity")?.textContent || "?"} | Cash: ${document.getElementById("dbgCash")?.textContent || "?"} | Fees: ${document.getElementById("dbgFees")?.textContent || "?"}`,
+        `Closed trades: ${summary.trades_closed ?? "?"} | Win rate: ${summary.winRate ? (summary.winRate * 100).toFixed(1) + "%" : "0.0%"} | Profit factor: ${(summary.profitFactor ?? 0).toFixed ? summary.profitFactor.toFixed(2) : summary.profitFactor}`,
+        `Expectancy: ${(summary.expectancy ?? 0).toFixed ? summary.expectancy.toFixed(2) : summary.expectancy}`
+      ].join("\n");
+
+      // Try clipboard API, else fall back to a selectable textarea
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(lines);
+          log("Copied summary to clipboard", "success");
+          return;
+        }
+      } catch (e) { }
+
+      const el = document.getElementById("dbgResults");
+      if (el) {
+        el.innerHTML = `
+      <div style="font-size:12px;color:#8b93b0;margin-bottom:6px;">Copy this summary:</div>
+      <textarea style="width:100%;height:140px;background:#0a0e27;color:#fff;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px;">${lines}</textarea>
+      <div style="font-size:11px;color:#8b93b0;margin-top:6px;">Tip: press and hold to select, then Copy.</div>
+    `;
+      }
+      log("Clipboard blocked by browser; showed selectable summary.", "info");
+    }
+
+    async function dbgShowState() {
+      const bundle = await dbgBuildBundle();
+      const el = document.getElementById("dbgResults");
+      if (el) {
+        el.innerHTML = `<pre style="white-space:pre-wrap;word-break:break-word;max-height:240px;overflow:auto;">${escapeHtml(JSON.stringify(bundle.indexeddb?.state || bundle.localStorage?.[STORAGE_KEY] || {}, null, 2))}</pre>`;
+      }
+      log("Displayed current state in Quick Results.", "info");
+    }
+
+    function dbgClearLog() {
+      dbgEvents = [];
+      const el = document.getElementById("debugLog");
+      if (el) el.innerHTML = "";
+      log("Log cleared.", "info");
+    }
+
+    // expose for inline onclick
+    window.dbgExportBundle = dbgExportBundle;
+    window.dbgCopySummary = dbgCopySummary;
+    window.dbgShowState = dbgShowState;
+    window.dbgClearLog = dbgClearLog;
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    // --- Debug panel state + updater (fixes Start/Stop/menu errors) ---
+    let dbgQuoteOk = 0;
+    let dbgQuoteErr = 0;
+    let dbgLastTickAt = null;
+    let dbgSessionId = null;
+
+    function dbgUpdatePanel() {
+      try {
+        if (!dbgSessionId) {
+          dbgSessionId = `sess_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}_${Math.random().toString(16).slice(2, 8)}`;
+        }
+        const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+
+        setTxt("dbgSessionId", dbgSessionId);
+        setTxt("dbgBotState", running ? (paused ? "paused" : "running") : "stopped");
+        setTxt("dbgLastTick", dbgLastTickAt ? new Date(dbgLastTickAt).toLocaleTimeString() : "—");
+        setTxt("dbgQuotesScanned", String(universe?.length || 0));
+        setTxt("dbgQuoteOk", String(dbgQuoteOk || 0));
+        setTxt("dbgQuoteErr", String(dbgQuoteErr || 0));
+        setTxt("dbgTradesCount", String(trades?.length || 0));
+        setTxt("dbgClosedCount", String(closedTrades?.length || 0));
+        setTxt("dbgFees", fmtMoney(totalFees));
+        // equity/exposure
+        let equity = cash;
+        let exposure = 0;
+        for (const [sym, p] of Object.entries(positions || {})) {
+          const cur = prices[sym] ?? p.avgPrice;
+          const v = (p.qty || 0) * (cur || 0);
+          equity += v;
+          exposure += v;
+        }
+        setTxt("dbgEquity", fmtMoney(equity));
+        setTxt("dbgCash", fmtMoney(cash));
+        setTxt("dbgExposure", fmtMoney(exposure));
+
+        const chip = document.getElementById("debugStatusChip");
+        if (chip) {
+          chip.textContent = running ? (paused ? "paused" : "running") : "idle";
+        }
+      } catch (e) {
+        // never allow debug panel to break the app
+      }
+    }
+
+    // --- Settings actions referenced by UI buttons ---
+    function saveSettings() {
+      try {
+        const budgetEl = document.getElementById("initialBudget");
+        const v = budgetEl ? Number(budgetEl.value) : NaN;
+
+        // read smarter controls (optional)
+        const rp = Number(document.getElementById("riskPct")?.value);
+        const mp = Number(document.getElementById("maxPositions")?.value);
+        const cd = Number(document.getElementById("cooldownMins")?.value);
+        const mh = Number(document.getElementById("maxHoldMins")?.value);
+        const asx = Number(document.getElementById("atrStopX")?.value);
+        const atx = Number(document.getElementById("atrTpX")?.value);
+        const eb = Number(document.getElementById("edgeBufferPct")?.value);
+        const rb = Number(document.getElementById("rangeBandPct")?.value);
+
+        const nextCfg = Object.assign({}, BOTCFG);
+        if (Number.isFinite(rp) && rp > 0) nextCfg.riskPct = rp / 100;
+        if (Number.isFinite(mp) && mp >= 1) nextCfg.maxPositions = Math.floor(mp);
+        if (Number.isFinite(cd) && cd >= 0) nextCfg.cooldownMs = cd * 60 * 1000;
+        if (Number.isFinite(mh) && mh >= 1) nextCfg.maxHoldMs = mh * 60 * 1000;
+        if (Number.isFinite(asx) && asx > 0) nextCfg.atrStopX = asx;
+        if (Number.isFinite(atx) && atx > 0) nextCfg.atrTpX = atx;
+        if (Number.isFinite(eb) && eb >= 0) nextCfg.edgeBufferPct = eb / 100;
+        if (Number.isFinite(rb) && rb > 0) nextCfg.rangeBandPct = rb / 100;
+
+        BOTCFG = nextCfg;
+        if (Number.isFinite(v) && v > 0) {
+          // persist "default starting capital" separate from current session
+          idbPut("settings", { key: "app", value: { initial_capital: v, strategy, feeModel: FEE, botCfg: BOTCFG, openai: { enabled: !!document.getElementById("openaiEnabled")?.checked, finnhubKey: BOTCFG.finnhubKey } } })
+            .then(() => log(`Settings saved (initial capital $${v.toFixed(2)})`, "success"))
+            .catch(() => log("Settings save failed", "error"));
+          // If bot is stopped, also apply immediately
+          if (!running) {
+            CAPITAL = v;
+            cash = v;
+            positions = {};
+            trades = [];
+            closedTrades = [];
+            totalFees = 0;
+            log(`Applied initial capital $${v.toFixed(2)} (bot stopped)`, "info");
+            saveState();
+            updateUI();
+            dbgUpdatePanel();
+          } else {
+            log("Saved initial capital; will apply on reset/clear (bot running).", "info");
+          }
+        } else {
+          log("Invalid initial budget value.", "error");
+        }
+      } catch (e) {
+        log(`Save settings error: ${e?.message || e}`, "error");
+      }
+    }
+
+
+    // --- OpenAI settings (encrypted local storage) ---
+    async function deriveKey(passphrase, salt) {
+      const enc = new TextEncoder();
+      const baseKey = await crypto.subtle.importKey("raw", enc.encode(passphrase), "PBKDF2", false, ["deriveKey"]);
+      return crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt, iterations: 120000, hash: "SHA-256" },
+        baseKey,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+    }
+
+    function b64(buf) {
+      return btoa(String.fromCharCode(...new Uint8Array(buf)));
+    }
+    function unb64(str) {
+      const bin = atob(str);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return bytes.buffer;
+    }
+
+    async function encryptApiKey(apiKey, passphrase) {
+      const enc = new TextEncoder();
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const key = await deriveKey(passphrase, salt);
+      const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, enc.encode(apiKey));
+      return { cipher: b64(ct), iv: b64(iv), salt: b64(salt) };
+    }
+
+    async function decryptApiKey(encObj, passphrase) {
+      const dec = new TextDecoder();
+      const iv = new Uint8Array(unb64(encObj.iv));
+      const salt = new Uint8Array(unb64(encObj.salt));
+      const key = await deriveKey(passphrase, salt);
+      const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, unb64(encObj.cipher));
+      return dec.decode(pt);
+    }
+
+    async function saveOpenAISettings() {
+      try {
+        const enabled = !!document.getElementById("openaiEnabled")?.checked;
+        const apiKey = (document.getElementById("openaiApiKey")?.value || "").trim();
+        const pass = (document.getElementById("openaiPassphrase")?.value || "").trim();
+
+        const row = await idbGet("settings", "app") || { key: "app", value: {} };
+        const next = Object.assign({}, row.value || {});
+        next.openai = Object.assign({}, next.openai || {});
+        next.openai.enabled = enabled;
+
+        if (apiKey) {
+          if (!pass) { log("Enter a passphrase to encrypt the API key.", "error"); return; }
+          if (!crypto?.subtle) { log("WebCrypto not available in this browser.", "error"); return; }
+          next.openai.encKey = await encryptApiKey(apiKey, pass);
+          log("OpenAI key encrypted + saved locally.", "success");
+          // clear plaintext input
+          document.getElementById("openaiApiKey").value = "";
+        } else {
+          log("OpenAI settings saved (no key change).", "info");
+        }
+
+        await idbPut("settings", { key: "app", value: next });
+        saveState(); // also persists botCfg snapshot
+      } catch (e) {
+        log(`OpenAI settings error: ${e?.message || e}`, "error");
+      }
+    }
+
+    async function saveDataSettings() {
+      try {
+        const useLive = !!document.getElementById("useLiveData")?.checked;
+        const key = (document.getElementById("finnhubApiKey")?.value || "").trim();
+        const url = (document.getElementById("apiBaseUrl")?.value || "").trim();
+
+        BOTCFG.useLiveData = useLive;
+        if (key) BOTCFG.finnhubKey = key;
+        if (url) BOTCFG.apiBaseUrl = url;
+
+        // Persist
+        const s = await idbGet("settings", "app") || { key: "app", value: {} };
+        const next = Object.assign({}, s.value || {});
+        next.botCfg = Object.assign(next.botCfg || {}, {
+          useLiveData: useLive,
+          finnhubKey: BOTCFG.finnhubKey,
+          apiBaseUrl: BOTCFG.apiBaseUrl
+        });
+        await idbPut("settings", { key: "app", value: next });
+
+        log(`Data Source updated: ${useLive ? "Live" : "Simulation"}. URL: ${BOTCFG.apiBaseUrl}`, "success");
+        if (useLive && !BOTCFG.finnhubKey) log("Warning: Live mode on but no Finnhub key. Only Crypto will work.", "error");
+
+        updateDbgLiveStatus();
+      } catch (e) {
+        log(`Data Settings error: ${e.message}`, "error");
+      }
+    }
+
+    function updateDbgLiveStatus() {
+      const el = document.getElementById("dbgLiveStatus");
+      if (el) {
+        el.textContent = BOTCFG.useLiveData ?
+          `Live Mode (${BOTCFG.finnhubKey ? "Stock+Crypto" : "Crypto Only"})` :
+          "Simulation Mode (Random Walk)";
+        el.style.color = BOTCFG.useLiveData ? "#00e396" : "#ba68c8";
+      }
+    }
+
+    // Placeholder: confirms key decrypts; does not make network calls by default.
+    async function openaiSelfTest() {
+      try {
+        const pass = (document.getElementById("openaiPassphrase")?.value || "").trim();
+        const s = await idbGet("settings", "app");
+        const encKey = s?.value?.openai?.encKey;
+        const enabled = !!s?.value?.openai?.enabled;
+        if (!enabled) { log("OpenAI is disabled in Settings.", "info"); return; }
+        if (!encKey) { log("No encrypted OpenAI key saved yet.", "error"); return; }
+        if (!pass) { log("Enter passphrase to decrypt for test.", "error"); return; }
+        const key = await decryptApiKey(encKey, pass);
+        if (key && key.startsWith("sk-")) log("OpenAI key decrypt OK (placeholder).", "success");
+        else log("Decrypted key doesn't look like an OpenAI key.", "error");
+      } catch (e) {
+        log(`OpenAI test failed: ${e?.message || e}`, "error");
+      }
+    }
+    async function clearData() {
+      try {
+        if (running) {
+          stopBot();
+        }
+        positions = {};
+        trades = [];
+        closedTrades = [];
+        totalFees = 0;
+
+        // load initial capital from settings if present
+        let initCap = CAPITAL;
+        try {
+          const s = await idbGet("settings", "app");
+          const cap = s?.value?.initial_capital;
+          if (Number.isFinite(Number(cap)) && Number(cap) > 0) initCap = Number(cap);
+        } catch (_e) { }
+
+        CAPITAL = initCap;
+        cash = initCap;
+
+        // clear stored state
+        await idbDelete("state", "current");
+        try { localStorage.removeItem(STORAGE_KEY); } catch (_e) { }
+        saveState();
+
+        const budgetEl = document.getElementById("initialBudget");
+        if (budgetEl) budgetEl.value = String(CAPITAL);
+
+        log("Cleared all data and reset session.", "success");
+        updateUI();
+        dbgUpdatePanel();
+      } catch (e) {
+        log(`Clear data error: ${e?.message || e}`, "error");
+      }
+    }
+
+    window.saveSettings = saveSettings;
+    window.saveDataSettings = saveDataSettings;
+    window.clearData = clearData;
+    window.dbgUpdatePanel = dbgUpdatePanel;
+
+
+
+
+
+    // ===== IndexedDB (Level 2 local DB) =====
+    const DB_NAME = "smart_trading_bot_db_v1";
+    const DB_VERSION = 1;
+
+    let _dbPromise = null;
+
+    function openDB() {
+      if (_dbPromise) return _dbPromise;
+      _dbPromise = new Promise((resolve, reject) => {
+        try {
+          const req = indexedDB.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = (ev) => {
+            const db = req.result;
+            const ensure = (name, opts) => { if (!db.objectStoreNames.contains(name)) db.createObjectStore(name, opts); };
+            ensure("meta", { keyPath: "key" });          // e.g. {key:"current_session_id", value:"..."}
+            ensure("settings", { keyPath: "key" });      // singleton rows keyed by string
+            ensure("sessions", { keyPath: "id" });       // session header
+            ensure("state", { keyPath: "key" });         // {key:"current", ...blob}
+            ensure("trades", { keyPath: "id" });         // executions (append)
+            ensure("positions", { keyPath: "key" });     // `${sessionId}:${symbol}`
+            ensure("equity_snapshots", { keyPath: "id" });// `${sessionId}:${ts}`
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        } catch (e) { reject(e); }
+      });
+      return _dbPromise;
+    }
+
+    function idbTx(db, stores, mode = "readonly") { return db.transaction(stores, mode); }
+
+    async function idbGet(store, key) {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        try {
+          const tx = idbTx(db, [store], "readonly");
+          const req = tx.objectStore(store).get(key);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        } catch (e) { resolve(null); }
+      });
+    }
+
+    async function idbPut(store, value) {
+      const db = await openDB();
+      return new Promise((resolve, reject) => {
+        try {
+          const tx = idbTx(db, [store], "readwrite");
+          const req = tx.objectStore(store).put(value);
+          req.onsuccess = () => resolve(true);
+          req.onerror = () => reject(req.error);
+        } catch (e) { resolve(false); }
+      });
+    }
+
+    async function idbDelete(store, key) {
+      const db = await openDB();
+      return new Promise((resolve) => {
+        try {
+          const tx = idbTx(db, [store], "readwrite");
+          const req = tx.objectStore(store).delete(key);
+          req.onsuccess = () => resolve(true);
+          req.onerror = () => resolve(false);
+        } catch (e) { resolve(false); }
+      });
+    }
+
+    // Migration: localStorage -> IndexedDB (only once)
+    async function migrateFromLocalStorageIfNeeded() {
+      try {
+        const migrated = await idbGet("meta", "migrated_from_localstorage");
+        if (migrated && migrated.value === true) return;
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          await idbPut("meta", { key: "migrated_from_localstorage", value: true });
+          return;
+        }
+        const state = JSON.parse(raw);
+        // Store entire blob in state/current
+        await idbPut("state", { key: "current", blob: state, savedAt: Date.now() });
+        // Store settings as singleton (for future expansion)
+        await idbPut("settings", { key: "app", value: { initial_capital: state.CAPITAL, feeModel: FEE, strategy: state.strategy } });
+        await idbPut("meta", { key: "migrated_from_localstorage", value: true });
+      } catch (e) {
+        // ignore migration errors
+      }
+    }
+
+    let _saveInFlight = false;
+    let _saveQueued = false;
+
+    function saveState() {
+      // keep existing callers; do async write behind the scenes
+      if (_saveInFlight) { _saveQueued = true; return; }
+      _saveInFlight = true;
+      (async () => {
+        try {
+          const state = {
+            v: 1,
+            running, paused,
+            CAPITAL, cash, totalFees,
+            strategy,
+            positions,
+            trades,
+            closedTrades,
+            prices,
+            priceHistory,
+            lastExit,
+            companyNames,
+            equityHistory,
+            BOTCFG
+          };
+          // Also keep a small safety backup in localStorage (optional)
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { }
+          // Save settings "app" snapshot
+          const settingsVal = { initial_capital: CAPITAL, strategy, feeModel: FEE, botCfg: BOTCFG, openai: (await idbGet("settings", "app"))?.value?.openai };
+          await idbPut("settings", { key: "app", value: settingsVal });
+
+          // Save to Backend
+          if (true) { // always try sync
+            const posList = Object.entries(positions).map(([k, v]) => ({
+              symbol: k, qty: v.qty, avg_price: v.avgPrice
+            }));
+
+            fetch("http://localhost:8000/sync_positions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(posList)
+            }).catch(e => console.error("Sync failed", e));
+          }
+        } catch (e) {
+          console.error("Error saving state:", e);
+        } finally {
+          _saveInFlight = false;
+          if (_saveQueued) { _saveQueued = false; saveState(); }
+        }
+      })();
+    }
+
+    async function loadState() {
+      try {
+        await openDB();
+        await migrateFromLocalStorageIfNeeded();
+        const row = await idbGet("state", "current");
+        if (row && row.blob) {
+          reviveState(row.blob);
+          return;
+        }
+      } catch (e) {
+        // ignore and fallback
+      }
+      // Fallback: localStorage
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        reviveState(state);
+      } catch (e) { }
+    }
+
+    function reviveState(state) {
+      // revive timestamps + guard arrays
+      if (!state) return;
+      running = !!state.running;
+      paused = !!state.paused;
+      CAPITAL = Number(state.CAPITAL ?? CAPITAL);
+      cash = Number(state.cash ?? cash);
+      totalFees = Number(state.totalFees ?? totalFees);
+      strategy = state.strategy || strategy;
+
+      lastExit = state.lastExit || lastExit || {};
+      companyNames = state.companyNames || companyNames || {};
+      if (state.BOTCFG) { BOTCFG = Object.assign(BOTCFG, state.BOTCFG); }
+
+      positions = state.positions || {};
+      trades = Array.isArray(state.trades) ? state.trades : [];
+      closedTrades = Array.isArray(state.closedTrades) ? state.closedTrades : [];
+
+      prices = state.prices || {};
+      priceHistory = state.priceHistory || {};
+      equityHistory = Array.isArray(state.equityHistory) ? state.equityHistory : [];
+
+
+      // revive trade times to numbers
+      for (const t of trades) {
+        if (t && t.time && typeof t.time !== "number") {
+          const ts = Date.parse(t.time);
+          if (!Number.isNaN(ts)) t.time = ts;
+        }
+      }
+      for (const ct of closedTrades) {
+        for (const k of ["timeIn", "timeOut"]) {
+          if (ct && ct[k] && typeof ct[k] !== "number") {
+            const ts = Date.parse(ct[k]);
+            if (!Number.isNaN(ts)) ct[k] = ts;
+          }
+        }
+      }
+      // revive lots times
+      for (const p of Object.values(positions)) {
+        if (p && Array.isArray(p.lots)) {
+          for (const lot of p.lots) {
+            if (lot && lot.time && typeof lot.time !== "number") {
+              const ts = Date.parse(lot.time);
+              if (!Number.isNaN(ts)) lot.time = ts;
+            }
+          }
+        }
+      }
+    }
+
+
+    // ---------- Trading core ----------
+    function buy(sym, usd, strat) {
+      const px = prices[sym];
+      if (!px) return false;
+      const qty = Math.max(0, usd / px);
+      if (qty <= 0) return false;
+      const notional = qty * px;
+      const fee = calcFee(notional);
+      const total = notional + fee;
+      if (total > cash) return false;
+
+      cash -= total;
+      totalFees += fee;
+
+      if (!positions[sym]) positions[sym] = { qty: 0, avgPrice: 0, feesPaid: 0, lots: [], strategy: null };
+      const p = positions[sym];
+      if (!p.strategy) p.strategy = strat || strategy || 'momentum';
+      // weighted average cost on notional (excluding fees for avgPrice display)
+      const newQty = p.qty + qty;
+      const newAvg = (p.avgPrice * p.qty + px * qty) / newQty;
+      p.qty = newQty;
+      p.avgPrice = newAvg;
+      p.feesPaid = (p.feesPaid || 0) + fee;
+      p.lots = p.lots || [];
+      p.lots.push({ qty, price: px, fee, time: now(), strategy: p.strategy });
+
+      trades.unshift({ side: "BUY", symbol: sym, qty, price: px, fee, notional, time: now(), strategy: p.strategy });
+
+      log(`BUY ${sym} ${qty.toFixed(4)} @ ${px.toFixed(4)} (fee ${fee.toFixed(2)})`);
+
+      // Record to Backend
+      fetch("http://localhost:8000/record_trade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          symbol: sym, side: "BUY", qty: qty, price: px, fee: fee, strategy: p.strategy
+        })
+      }).catch(e => console.error("Trade record failed", e));
+
+      saveState();
+      return true;
+    }
+
+    function sell(sym, qty) {
+      const p = positions[sym];
+      if (!p || p.qty <= 0) return false;
+      const px = prices[sym];
+      if (!px) return false;
+
+      const sellQty = Math.min(qty, p.qty);
+      const notional = sellQty * px;
+      const fee = calcFee(notional);
+      const proceeds = notional - fee;
+
+      cash += proceeds;
+      totalFees += fee;
+
+      // FIFO lots to compute realized P&L and fees (MooMoo-ish)
+      let remaining = sellQty;
+      let entryNotional = 0;
+      let buyFees = 0;
+      let earliestIn = null;
+
+      p.lots = p.lots || [];
+      while (remaining > 1e-12 && p.lots.length) {
+        const lot = p.lots[0];
+        const take = Math.min(remaining, lot.qty);
+        entryNotional += take * lot.price;
+        buyFees += (lot.fee || 0) * (take / lot.qty);
+        earliestIn = earliestIn ?? lot.time;
+        lot.qty -= take;
+        remaining -= take;
+        if (lot.qty <= 1e-12) p.lots.shift();
+      }
+
+      p.qty -= sellQty;
+      p.qty = Math.max(0, p.qty);
+
+      if (p.qty <= 1e-12) {
+        delete positions[sym];
+      } else {
+        // recompute avgPrice from remaining lots for display
+        let totQty = 0, totNot = 0;
+        for (const lot of p.lots) {
+          totQty += lot.qty;
+          totNot += lot.qty * lot.price;
+        }
+        p.avgPrice = totQty ? (totNot / totQty) : p.avgPrice;
+      }
+
+      const grossPnl = notional - entryNotional;
+      const netPnl = (notional - fee) - (entryNotional + buyFees);
+
+      closedTrades.unshift({
+        symbol: sym,
+        qty: sellQty,
+        entryPrice: entryNotional / sellQty,
+        exitPrice: px,
+        buyFee: buyFees,
+        sellFee: fee,
+        grossPnl,
+        netPnl,
+        timeIn: earliestIn ?? now(),
+        timeOut: now()
+      });
+
+      trades.unshift({ side: "SELL", symbol: sym, qty: sellQty, price: px, notional, time: now(), netPnl });
+
+      log(`SELL ${sym} ${sellQty.toFixed(4)} @ ${px.toFixed(4)} (net P&L ${netPnl.toFixed(2)})`);
+
+      // Record to Backend
+      fetch("http://localhost:8000/record_trade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          symbol: sym, side: "SELL", qty: sellQty, price: px, fee: fee, pnl: netPnl, strategy: p.strategy || "manual"
+        })
+      }).catch(e => console.error("Trade record failed", e));
+
+      saveState();
+      return true;
+    }
+
+    // ---------- Scanning / strategy ----------
+    async function scan() {
+      // update quotes for whole universe
+      // Rate Limit Logic:
+      // If Live Mode, we can't fetch 300 tickers at once.
+      // Strategy:
+      // 1. Fetch ALL active positions every tick (critical).
+      // 2. Fetch a specific "Watchlist" or a rotating subset of the universe.
+      // For now: Fetch Top 20 US + All Crypto.
+
+      let scanList = universe;
+      if (BOTCFG.useLiveData) {
+        // Only scan top 20 symbols to save API calls in demo
+        scanList = universe.slice(0, 15);
+        // Also ensure we scan any active positions
+        const openPos = Object.keys(positions);
+        for (const s of openPos) {
+          if (!scanList.includes(s)) scanList.push(s);
+        }
+      }
+
+      // Use Promise.all for parallel fetch (up to a limit?)
+      // Browser handles parallelism, but Finnhub might 429 if too fast.
+      // batch into chunks of 5
+      if (BOTCFG.useLiveData) {
+        const chunkSize = 5;
+        for (let i = 0; i < scanList.length; i += chunkSize) {
+          const chunk = scanList.slice(i, i + chunkSize);
+          await Promise.all(chunk.map(sym => fetchQuote(sym)));
+          // small delay between chunks to be nice to API
+          await new Promise(r => setTimeout(r, 200));
+        }
+      } else {
+        // Simulation: fast
+        for (const sym of universe) {
+          randomWalk(sym);
+        }
+      }
+
+      // debug counters (simulated quotes)
+      dbgQuoteOk = universe.length;
+      dbgQuoteErr = 0;
+      dbgLastTickAt = Date.now();
+
+      const movers = [];
+      for (const sym of universe) {
+        const ind = getIndicators(sym);
+        if (!ind) continue;
+
+        // volatility gate
+        if (!Number.isFinite(ind.atrPct)) continue;
+        if (ind.atrPct < BOTCFG.minAtrPct || ind.atrPct > BOTCFG.maxAtrPct) continue;
+
+        const r1 = getReturnPct(sym, 60000); // 1m return (ratio)
+        movers.push({ symbol: sym, r1, ind });
+      }
+
+      // build opportunities with regime gating
+      const opps = [];
+      for (const m of movers) {
+        const sym = m.symbol;
+        const p = m.ind.p;
+        const r1 = m.r1;
+
+        // cooldown (post-exit) prevents churn
+        const lx = lastExit[sym];
+        if (lx && (now() - lx) < BOTCFG.cooldownMs) continue;
+
+        // Only trade when signal exceeds fees+buffer at a reasonable notional (use 10% cash estimate)
+        const estNotional = Math.max(50, Math.min(cash * 0.10, (CAPITAL || cash) * 0.15));
+        const minEdge = minEdgeRequiredPct(estNotional);
+
+        // Momentum longs only in trend_up
+        if (m.ind.regime === "trend_up" && r1 >= STRAT.momentum.buyPct && r1 >= minEdge) {
+          opps.push({ symbol: sym, price: p, r1, strategy: "momentum", tag: `trend_up ${(r1 * 100).toFixed(2)}%` });
+          continue;
+        }
+
+        // Mean reversion longs only in range (buy dips)
+        if (m.ind.regime === "range" && r1 <= STRAT.meanrevert.buyPct && Math.abs(r1) >= minEdge) {
+          opps.push({ symbol: sym, price: p, r1, strategy: "meanrevert", tag: `range dip ${(r1 * 100).toFixed(2)}%` });
+          continue;
+        }
+      }
+
+      // prioritize strongest signals (further beyond threshold)
+      opps.sort((a, b) => Math.abs(b.r1) - Math.abs(a.r1));
+      opportunities = opps.slice(0, 50);
+
+      dbgLog(`scan: universe=${universe.length} opps=${opportunities.length} cash=${cash.toFixed(2)}`, "debug");
+      saveState();
+    }
+
+    function tradeTick() {
+      if (!running || paused) return;
+
+      // compute equity (cash + holdings)
+      let equity = cash;
+      for (const [sym, p] of Object.entries(positions)) {
+        const cur = prices[sym] ?? p.avgPrice;
+        equity += (cur * p.qty);
+      }
+
+      const openCount = Object.keys(positions).length;
+
+      // try buys from top opportunities, respecting max positions
+      if (openCount < BOTCFG.maxPositions) {
+        for (const o of opportunities.slice(0, 20)) {
+          if (Object.keys(positions).length >= BOTCFG.maxPositions) break;
+          const sym = o.symbol;
+          if (positions[sym]) continue;
+
+          const ind = getIndicators(sym);
+          if (!ind) continue;
+
+          // cooldown guard (again)
+          const lx = lastExit[sym];
+          if (lx && (now() - lx) < BOTCFG.cooldownMs) continue;
+
+          // ATR-based risk sizing
+          const atrPct = ind.atrPct;
+          const stopDist = BOTCFG.atrStopX * atrPct * ind.p; // $ per share proxy
+          if (!Number.isFinite(stopDist) || stopDist <= 0) continue;
+
+          const riskAmt = Math.max(0, equity * BOTCFG.riskPct);
+
+          // Risk-based qty (allows fractional for simulation), then cap by allocation
+          let qty = (stopDist > 0) ? (riskAmt / stopDist) : 0;
+          const maxAlloc = cash * 0.25; // cap allocation per position
+          const maxQtyByAlloc = (ind.p > 0) ? (maxAlloc / ind.p) : 0;
+          qty = Math.min(qty, maxQtyByAlloc);
+
+          // keep qty reasonably sized (avoid tiny dust)
+          qty = Math.floor(qty * 10000) / 10000; // 4dp
+          const notional = qty * ind.p;
+
+          // sanity + affordability
+          if (qty <= 0) continue;
+          if (notional <= 0) continue;
+          if (notional < 25) continue;
+
+          // minimum edge threshold (fees+buffer)
+          const minEdge = minEdgeRequiredPct(notional);
+          if (Math.abs(o.r1) < minEdge) continue;
+
+          buy(sym, notional, o.strategy);
+        }
+      }
+
+      // manage open positions: ATR stop / take profit / time stop
+      for (const [sym, p] of Object.entries(positions)) {
+        const cur = prices[sym] ?? p.avgPrice;
+
+        // initialize risk targets if missing
+        if (!p.entryTime) p.entryTime = now();
+        if (!p.atrPct) {
+          const ind = getIndicators(sym);
+          p.atrPct = ind?.atrPct || 0.01;
+        }
+        if (!p.stopPrice || !p.takePrice) {
+          const atr = p.atrPct * p.avgPrice;
+          p.stopPrice = p.avgPrice - BOTCFG.atrStopX * atr;
+          p.takePrice = p.avgPrice + BOTCFG.atrTpX * atr;
+
+          // mean reversion usually tighter profit target
+          if ((p.strategy || strategy) === "meanrevert") {
+            p.takePrice = p.avgPrice + Math.max(1.2, BOTCFG.atrTpX * 0.7) * atr;
+            p.stopPrice = p.avgPrice - Math.max(1.2, BOTCFG.atrStopX * 0.9) * atr;
+          }
+        }
+
+        const heldMs = now() - (p.entryTime || now());
+        const timeStop = heldMs > BOTCFG.maxHoldMs;
+
+        if (cur <= p.stopPrice || cur >= p.takePrice || timeStop) {
+          sell(sym, p.qty);
+          lastExit[sym] = now();
+        }
+      }
+
+      saveState();
+      updateUI();
+      dbgUpdatePanel();
+    }
+
+    // ---------- Rendering ----------
+    function updateUI() {
+      // totals
+      let equity = cash;
+      for (const [sym, p] of Object.entries(positions)) {
+        const cur = prices[sym] ?? p.avgPrice;
+        equity += p.qty * cur;
+      }
+      const netPnl = equity - CAPITAL;
+
+      // Track history for graph (debounce to avoid too many points)
+      if (!equityHistory) equityHistory = [];
+      const nowTs = now();
+      if (equityHistory.length === 0 || nowTs - equityHistory[equityHistory.length - 1].t > 60000) {
+
+        // Keep last 100 points
+        if (equityHistory.length > 100) equityHistory.shift();
+      }
+      drawPnlChart();
+
+      // Top portfolio summary (was static in HTML)
+      const pvEl = document.getElementById("portfolioValue");
+      if (pvEl) {
+        pvEl.textContent = fmtMoney(equity);
+        const cls = netPnl > 0 ? "profit" : netPnl < 0 ? "loss" : "";
+        pvEl.className = `portfolio-value ${cls}`;
+      }
+
+      const pnlPctEl = document.getElementById("pnlPercent");
+      if (pnlPctEl) {
+        const pct = CAPITAL ? (netPnl / CAPITAL) * 100 : 0;
+        pnlPctEl.textContent = `${pct.toFixed(2)}%`;
+      }
+
+      const pnlInitEl = document.getElementById("pnlInitial");
+      if (pnlInitEl) {
+        pnlInitEl.textContent = fmtMoney(CAPITAL);
+      }
+
+      const cashEl = document.getElementById("cash");
+      if (cashEl) cashEl.textContent = fmtMoney(cash);
+
+      const feesEl = document.getElementById("totalFees");
+      if (feesEl) feesEl.textContent = fmtMoney(totalFees);
+
+      const statusEl = document.getElementById("botStatus");
+      if (statusEl) {
+        statusEl.textContent = running ? (paused ? "PAUSED" : "RUNNING") : "STOPPED";
+      }
+
+      // opportunities
+      const oppCount = document.getElementById("oppCount");
+      if (oppCount) oppCount.textContent = `${opportunities.length} found`;
+
+      // Helper to get name with overrides (fixes "ADA-USD" vs "Cardano")
+      const getName = (sym) => {
+        const OVERRIDES = {
+          "BTC-USD": "Bitcoin", "ETH-USD": "Ethereum", "SOL-USD": "Solana", "XRP-USD": "XRP",
+          "ADA-USD": "Cardano", "DOGE-USD": "Dogecoin", "AVAX-USD": "Avalanche",
+          "DOT-USD": "Polkadot", "MATIC-USD": "Polygon", "LINK-USD": "Chainlink",
+          "BNB-USD": "Binance Coin", "TRX-USD": "TRON", "LTC-USD": "Litecoin"
+        };
+        if (OVERRIDES[sym]) return OVERRIDES[sym];
+        const meta = companyNames[sym] || {};
+        return meta.name || sym;
+      };
+
+      const oppEl = document.getElementById("opportunities");
+      if (oppEl) {
+        if (!opportunities.length) {
+          oppEl.innerHTML = `<div class="empty">Bot will auto-scan when started</div>`;
+        } else {
+          oppEl.innerHTML = opportunities.map(o => {
+            const r = (o.r1 * 100);
+            const rcls = r >= 0 ? "pos" : "neg";
+            const meta = companyNames[o.symbol] || {};
+            const name = getName(o.symbol); // Use helper
+            const logoUrl = meta.logo;
+
+            // Use first letter if no logo
+            const logoHtml = logoUrl ? `<img src="${logoUrl}">` : name.charAt(0);
+            const isHigh = Math.abs(r) > 1.0;
+
+            return `<div class="opp-card ${isHigh ? 'high-prob' : ''}" onclick="showDetails('${o.symbol}')" style="cursor:pointer;">
+          <div class="opp-card-header">
+             <div style="display:flex;align-items:center;">
+                <div class="opp-logo">${logoHtml}</div>
+                <div>
+                   <div class="opp-ticker">${o.symbol}</div>
+                   <div class="opp-name">${name}</div>
+                </div>
+             </div>
+             <div style="text-align:right;">
+                <div class="opp-price">${fmtMoney(o.price)}</div>
+                <div class="pct ${rcls}">${r.toFixed(2)}%</div>
+             </div>
+          </div>
+          <div class="opp-meta">
+             <span class="badge mini strategy ${o.strategy}">${o.strategy.toUpperCase()}</span>
+             <span class="badge mini" style="background:#1a1f3a;border:1px solid #444;">${o.tag}</span>
+             ${meta.industry ? `<span class="badge mini" style="background:#1a1f3a;color:#888;">${meta.industry}</span>` : ''}
+          </div>
+        </div>`;
+          }).join("");
+        }
+      }
+      // positions (more detail)
+      const posEl = document.getElementById("positions");
+      const posKeys = Object.keys(positions);
+      const pc = document.getElementById("posCount");
+      // Update count in header
+      if (pc) pc.textContent = `${posKeys.length} open`;
+      // Also update stats block just in case
+      const posStat = document.querySelector("#section-trade .stats #posCount");
+      if (posStat) posStat.textContent = posKeys.length;
+
+      if (posEl) {
+        if (!posKeys.length) {
+          posEl.innerHTML = `<div class="empty">No positions yet</div>`;
+        } else {
+          posEl.innerHTML = posKeys.map(sym => {
+            const p = positions[sym];
+            const cur = prices[sym] ?? p.avgPrice;
+            const value = p.qty * cur;
+            const cost = p.qty * p.avgPrice;
+            const upnl = value - cost;
+            const upnlPct = cost ? (upnl / cost) * 100 : 0;
+            const cls = upnl >= 0 ? "pos" : "neg";
+            const meta = companyNames[sym] || {};
+            const name = getName(sym); // Use helper
+            const logoUrl = meta.logo;
+            const logoHtml = logoUrl ? `<img src="${logoUrl}">` : name.charAt(0);
+
+            return `<div class="opp-card" style="border-left-color:${upnl >= 0 ? '#00e396' : '#ff4560'};">
+              <div class="opp-card-header">
+                 <div style="display:flex;align-items:center;">
+                    <div class="opp-logo">${logoHtml}</div>
+                    <div>
+                       <div class="opp-ticker">${sym}</div>
+                       <div class="opp-name">${name}</div>
+                    </div>
+                 </div>
+                 <div style="text-align:right;">
+                    <div class="opp-price" style="color:${upnl >= 0 ? '#00e396' : '#ff4560'}">${fmtMoney(upnl)}</div>
+                    <div class="pct ${cls}">${upnlPct.toFixed(2)}%</div>
+                 </div>
+              </div>
+              <div class="opp-meta" style="justify-content:space-between; width:100%; font-size:11px; color:#888;">
+                 <span>Qty: ${p.qty.toFixed(4)}</span>
+                 <span>Val: ${fmtMoney(value)}</span>
+                 <span>Entry: ${p.avgPrice.toFixed(2)}</span>
+              </div>
+            </div>`;
+          }).join("");
+        }
+      }
+
+      // recent trades (executions)
+      const trEl = document.getElementById("trades");
+      if (trEl) {
+        if (!trades.length) {
+          trEl.innerHTML = `<div class="empty">No trades yet</div>`;
+        } else {
+          trEl.innerHTML = trades.slice(0, 12).map(t => {
+            const time = new Date(t.time).toLocaleTimeString();
+            const cls = t.side === "BUY" ? "" : (t.netPnl >= 0 ? "pos" : "neg");
+            const meta = companyNames[t.symbol] || {};
+            const name = getName(t.symbol);
+            const logoUrl = meta.logo;
+            const logoHtml = logoUrl ? `<img src="${logoUrl}">` : name.charAt(0);
+
+            // PnL text for sells
+            const pnlHtml = (t.side === "SELL" && typeof t.netPnl === "number")
+              ? `<div class="pct ${cls}">${fmtMoney(t.netPnl)}</div>`
+              : `<div class="pct" style="color:#8b93b0">ENTRY</div>`;
+
+            // Canvas ID for sparkline (we'll draw it after render)
+            const canId = `spark_${t.symbol}_${Math.random().toString(36).substr(2, 5)}`;
+            // Trigger sparkline draw with Entry Price (t.price is entry for trades)
+            setTimeout(() => drawSparkline(canId, t.symbol, t.price), 100);
+
+            return `<div class="opp-card" onclick="showDetails('${t.symbol}')" style="cursor:pointer;">
+              <div class="opp-card-header">
+                 <div style="display:flex;align-items:center;">
+                    <div class="opp-logo">${logoHtml}</div>
+                    <div>
+                       <div class="opp-ticker">${t.symbol} <span class="badge mini ${t.side === 'BUY' ? '' : 'neg'}">${t.side}</span></div>
+                       <div class="opp-name">${name}</div>
+                    </div>
+                 </div>
+                 <div style="text-align:right;">
+                    <div class="opp-price">${fmtMoney(t.price)}</div>
+                    ${pnlHtml}
+                 </div>
+              </div>
+              <canvas id="${canId}" width="200" height="30" style="width:100%; height:30px; margin:5px 0; opacity:0.8;"></canvas>
+              <div class="opp-meta" style="justify-content:space-between; width:100%; font-size:11px; color:#888;">
+                 <span>Qty: ${t.qty.toFixed(4)}</span>
+                 <span>Time: ${time}</span>
+              </div>
+            </div>`;
+          }).join("");
+        }
+      }
+
+      syncBotControls();
+      updatePnL();
+    }
+
+    function updatePnL() {
+      const equity = (() => {
+        let e = cash;
+        for (const [sym, p] of Object.entries(positions)) {
+          const cur = prices[sym] ?? p.avgPrice;
+          e += p.qty * cur;
+        }
+        return e;
+      })();
+
+      const net = equity - CAPITAL;
+
+      // summary
+      const pnlEl = document.getElementById("pnl");
+      if (pnlEl) pnlEl.textContent = fmtMoney(net);
+
+      const pnlBig = document.getElementById("pnlBig");
+      if (pnlBig) {
+        pnlBig.textContent = fmtMoney(net);
+        pnlBig.className = "pnl-big " + (net >= 0 ? "profit" : "loss");
+      }
+
+      const pnlPct = document.getElementById("pnlPercent");
+      if (pnlPct) {
+        const pctVal = CAPITAL ? (net / CAPITAL) * 100 : 0;
+        pnlPct.textContent = pctVal.toFixed(2) + "%";
+        pnlPct.className = pctVal >= 0 ? "pos" : "neg";
+      }
+
+      // closed-trade stats
+      let grossProfit = 0, grossLoss = 0, wins = 0, losses = 0, best = -Infinity, worst = Infinity;
+      let sumWin = 0, sumLoss = 0;
+      for (const ct of closedTrades) {
+        const n = ct.netPnl || 0;
+        if (n >= 0) { grossProfit += n; wins++; sumWin += n; }
+        else { grossLoss += n; losses++; sumLoss += n; }
+        if (n > best) best = n;
+        if (n < worst) worst = n;
+      }
+      const total = wins + losses;
+      const wr = total ? (wins / total) * 100 : 0;
+
+      const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      set("grossProfit", fmtMoney(grossProfit));
+      set("grossLoss", fmtMoney(grossLoss));
+      set("totalTrades", String(total));
+      set("winCount", String(wins));
+      set("lossCount", String(losses));
+      set("winRate", `${wr.toFixed(1)}%`);
+      set("winRateAnalysis", `${wins}/${total || 0}`);
+      set("bestTrade", (best === -Infinity) ? "$0.00" : fmtMoney(best));
+      set("worstTrade", (worst === Infinity) ? "$0.00" : fmtMoney(worst));
+      set("avgWin", wins ? fmtMoney(sumWin / wins) : "$0.00");
+      set("avgLoss", losses ? fmtMoney(sumLoss / losses) : "$0.00");
+      set("avgTrade", total ? fmtMoney((grossProfit + grossLoss) / total) : "$0.00");
+
+      // trade history (closed only)
+      const th = document.getElementById("tradeHistory");
+      if (th) {
+        if (!closedTrades.length) {
+          th.innerHTML = `<div class="empty">No closed trades yet</div>`;
+        } else {
+          th.innerHTML = closedTrades.slice(0, 30).map(ct => {
+            const cls = ct.netPnl >= 0 ? "pos" : "neg";
+            const inT = new Date(ct.timeIn).toLocaleTimeString();
+            const outT = new Date(ct.timeOut).toLocaleTimeString();
+            const fees = (ct.buyFee || 0) + (ct.sellFee || 0);
+            return `<div class="row">
+          <div>
+            <div class="ticker">${ct.symbol} • ${ct.qty.toFixed(4)}</div>
+            <div class="sub">Buy ${ct.entryPrice.toFixed(4)} (${inT}) → Sell ${ct.exitPrice.toFixed(4)} (${outT})</div>
+            <div class="sub">Gross ${fmtMoney(ct.grossPnl)} • Fees ${fmtMoney(fees)} • Net <span class="${cls}">${fmtMoney(ct.netPnl)}</span></div>
+          </div>
+          <div style="text-align:right;"><div class="pct ${cls}">${fmtMoney(ct.netPnl)}</div></div>
+        </div>`;
+          }).join("");
+        }
+      }
+    }
+
+    // Poll Backend Status (Data Source check)
+    setInterval(checkStatus, 10000); // Every 10s
+
+    async function checkStatus() {
+      try {
+        const res = await fetch(`${API_URL}/status`);
+        if (res.ok) {
+          const json = await res.json();
+          const dsEl = document.getElementById("dataSource");
+          if (dsEl && json.data_source) {
+            dsEl.textContent = "Data: " + json.data_source;
+            if (json.data_source.includes("Live")) {
+              dsEl.style.color = "#00e396";
+              dsEl.style.borderColor = "#00e396";
+            } else {
+              dsEl.style.color = "#feb019";
+              dsEl.style.borderColor = "#feb019";
+            }
+          }
+        }
+      } catch (e) { }
+    }
+    // Initial check
+    setTimeout(checkStatus, 1000);
+
+    // 5-second P&L History Timer
+    setInterval(() => {
+      // Update Last Scan time if running
+      if (running) {
+        const lsEl = document.getElementById("lastScan");
+        if (lsEl) lsEl.textContent = "Last: " + new Date().toLocaleTimeString();
+      }
+
+      if (!running && !equityHistory.length) return;
+      // Calculate current equity
+      let e = cash;
+      for (const [sym, p] of Object.entries(positions)) {
+        const cur = prices[sym] ?? p.avgPrice;
+        e += p.qty * cur;
+      }
+      // Push if changed or every 5s
+      const last = equityHistory[equityHistory.length - 1];
+      if (!last || Math.abs(last.v - e) > 0.01 || (Date.now() - last.t > 4000)) {
+        equityHistory.push({ t: Date.now(), v: e });
+        // excessive history clip (keep last ~4 hours @ 5s = 2880 pts)
+        if (equityHistory.length > 3000) equityHistory.shift();
+        drawPnlChart();
+      }
+    }, 5000);
+
+    function syncBotControls() {
+      const start = document.getElementById('btnStart');
+      const pauseBtn = document.getElementById('btnPause');
+      const stop = document.getElementById('btnStop');
+      if (!start || !pauseBtn || !stop) return;
+
+      if (running) {
+        start.disabled = true;
+        stop.disabled = false;
+        pauseBtn.disabled = false;
+        pauseBtn.textContent = paused ? "Resume" : "Pause";
+      } else {
+        start.disabled = false;
+        stop.disabled = true;
+        pauseBtn.disabled = true;
+        pauseBtn.textContent = "Pause";
+      }
+    }
+
+    function startBot() {
+      if (running && !paused) return;
+      running = true;
+      paused = false;
+      localStorage.setItem('bot_was_running', 'true'); // Persist active state
+
+      if (scanTimer) clearInterval(scanTimer);
+      if (tradeTimer) clearInterval(tradeTimer);
+
+      scanTimer = setInterval(() => { if (running && !paused) scan(); }, SCAN_INT);
+      tradeTimer = setInterval(() => { if (running && !paused) tradeTick(); }, TRADE_INT);
+
+      log("Bot started");
+      saveState();
+      updateUI();
+      dbgUpdatePanel();
+    }
+
+    function pauseBot() {
+      if (!running) return;
+      paused = !paused;
+      log(paused ? "Bot paused" : "Bot resumed");
+      saveState();
+      updateUI();
+      dbgUpdatePanel();
+    }
+
+    function stopBot() {
+      running = false;
+      paused = false;
+      localStorage.setItem('bot_was_running', 'false'); // Clear active state
+      if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
+      if (tradeTimer) { clearInterval(tradeTimer); tradeTimer = null; }
+      log("Bot stopped");
+      saveState();
+      updateUI();
+      dbgUpdatePanel();
+    }
+
+    // ---------- Persistence (New) ----------
+    function exportData() {
+      // 1. Get everything from IDB
+      (async () => {
+        try {
+          if (_saveInFlight) await new Promise(r => setTimeout(r, 500));
+
+          const stateRow = await idbGet("state", "current");
+          const settingsRow = await idbGet("settings", "app");
+
+          const exportObj = {
+            version: APP_VERSION,
+            exportedAt: new Date().toISOString(),
+            state: stateRow ? stateRow.blob : null,
+            settings: settingsRow ? settingsRow.value : null
+          };
+
+          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+          const dlAnchorElem = document.createElement('a');
+          dlAnchorElem.setAttribute("href", dataStr);
+          dlAnchorElem.setAttribute("download", `smart_trading_bot_backup_${new Date().toISOString().slice(0, 10)}.json`);
+          dlAnchorElem.click();
+          log("Data exported successfully", "success");
+        } catch (e) {
+          log("Export failed: " + e.message, "error");
+        }
+      })();
+    }
+
+    function triggerImport() {
+      document.getElementById('importFile').click();
+    }
+
+    function importData(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function (e) {
+        try {
+          const contents = e.target.result;
+          const data = JSON.parse(contents);
+
+          if (!data.state && !data.settings) throw new Error("Invalid backup file");
+
+          if (data.state) {
+            await idbPut("state", { key: "current", blob: data.state, savedAt: Date.now() });
+          }
+          if (data.settings) {
+            await idbPut("settings", { key: "app", value: data.settings });
+          }
+
+          alert("Data imported successfully! The page will now reload.");
+          location.reload();
+        } catch (err) {
+          log("Import failed: " + err.message, "error");
+          alert("Error importing file: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // ---------- File System Access API (Live DB) ----------
+    let dirHandle = null;
+    let fileHandle = null;
+    const DB_FILENAME = "smart_trading_bot_data.json";
+
+    async function connectDbFolder() {
+      try {
+        dirHandle = await window.showDirectoryPicker();
+        if (dirHandle) {
+          // Get/Create file handle
+          fileHandle = await dirHandle.getFileHandle(DB_FILENAME, { create: true });
+
+          document.getElementById('dbName').textContent = "Folder: " + dirHandle.name;
+          document.getElementById('dbStatus').classList.add('connected');
+
+          // Try to read
+          const file = await fileHandle.getFile();
+          const text = await file.text();
+          if (text.trim().length > 0) {
+            try {
+              const data = JSON.parse(text);
+              if (confirm(`Found ${DB_FILENAME} in this folder. Load it?`)) {
+                if (data.state) await idbPut("state", { key: "current", blob: data.state, savedAt: Date.now() });
+                if (data.settings) await idbPut("settings", { key: "app", value: data.settings });
+                alert("Data loaded! Reloading...");
+                location.reload();
+                return;
+              }
+            } catch (e) { /* ignore empty/bad file */ }
+          }
+          log("Connected to folder. Auto-saving to " + DB_FILENAME, "success");
+        }
+      } catch (e) {
+        log("Folder Connect failed: " + e.message, "error");
+      }
+    }
+
+    async function saveToHandle(dataObj) {
+      if (!fileHandle) return;
+      try {
+        const writable = await fileHandle.createWritable();
+        await writable.write(JSON.stringify(dataObj, null, 2));
+        await writable.close();
+      } catch (e) {
+        log("Auto-save to file failed: " + e.message, "error");
+        // If permission lost, reset UI
+        if (e.name === 'NotAllowedError') {
+          fileHandle = null;
+          document.getElementById('dbName').textContent = "Connection lost (permission)";
+          document.getElementById('dbStatus').classList.remove('connected');
+        }
+      }
+    }
+
+    // ---------- Chart Drawing ----------
+
+    function drawPnlChart() {
+      const canvas = document.getElementById("pnlChart");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      if (!equityHistory || equityHistory.length < 2) {
+        ctx.fillStyle = "#8b93b0";
+        ctx.font = "10px sans-serif";
+        ctx.fillText("Waiting for more data...", 10, h / 2);
+        return;
+      }
+
+      // ROLLING WINDOW: Last 3 minutes (180s)
+      const now = Date.now();
+      const cutoff = now - 180000;
+
+      // Filter points within window + 1 prior point for continuity
+      let startIndex = equityHistory.findIndex(p => p.t >= cutoff);
+      if (startIndex === -1) startIndex = equityHistory.length - 1;
+      if (startIndex > 0) startIndex--;
+
+      const dataSlice = equityHistory.slice(startIndex);
+      if (dataSlice.length < 2 && equityHistory.length > 2) {
+        // If we have history but nothing in window (flatline), show last point extended
+        // But effectively we need at least 2 points to draw line
+      }
+
+      // Fixed X Range: [now-3m, now]
+      const minT = cutoff;
+      const maxT = now;
+
+      // Y Scaling based on VISIBLE dataSlice
+      let minV = Infinity, maxV = -Infinity;
+      for (const p of dataSlice) {
+        if (p.v < minV) minV = p.v;
+        if (p.v > maxV) maxV = p.v;
+      }
+      // Ensure we include CAPITAL/BreakEven in range scaling if close
+      // buffer
+      const rangeV = maxV - minV || 1;
+      minV -= rangeV * 0.1;
+      maxV += rangeV * 0.1;
+
+      const getX = (t) => ((t - minT) / (maxT - minT)) * w;
+      const getY = (v) => h - ((v - minV) / (maxV - minV)) * h;
+
+      // Draw Cumulative Line
+      ctx.beginPath();
+      // If first point is after cutoff, start line from left edge at its value?
+      // Or just draw from point. Let's draw from point.
+      for (let i = 0; i < dataSlice.length; i++) {
+        const x = getX(dataSlice[i].t);
+        const y = getY(dataSlice[i].v);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      // Optionally extend to "now" at last known value
+      const last = dataSlice[dataSlice.length - 1];
+      if (last) {
+        ctx.lineTo(getX(now), getY(last.v));
+      }
+
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Break-even line
+      // check if CAPITAL is within view
+      const yBE = getY(CAPITAL);
+      if (yBE >= 0 && yBE <= h) {
+        ctx.beginPath();
+        ctx.moveTo(0, yBE);
+        ctx.lineTo(w, yBE);
+        ctx.strokeStyle = "rgba(255,255,255,0.3)";
+        ctx.setLineDash([4, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Stats Text (Start vs Current)
+      if (dataSlice.length > 0) {
+        const startVal = dataSlice[0].v;
+        // Use last point in slice or history
+        const curVal = dataSlice[dataSlice.length - 1].v;
+        const diff = curVal - startVal;
+        const pct = startVal !== 0 ? (diff / startVal) * 100 : 0;
+        const sign = diff >= 0 ? "+" : "";
+
+        ctx.font = "11px monospace";
+        ctx.fillStyle = "#8b93b0";
+        ctx.textAlign = "left";
+        ctx.fillText(`Start: ${fmtMoney(startVal)}`, 5, 15);
+
+        ctx.textAlign = "right";
+        ctx.fillStyle = diff >= 0 ? "#00e396" : "#ff4560";
+        // "Now: $305.20 (+$5.20 / +1.73%)"
+        const diffText = `(${sign}${fmtMoney(diff)} / ${sign}${pct.toFixed(2)}%)`;
+        ctx.fillText(`Now: ${fmtMoney(curVal)} ${diffText}`, w - 5, 15);
+        ctx.textAlign = "left";
+      }
+
+    }
+
+    window.addEventListener('resize', drawPnlChart);
+
+    // Auto-Start Validation
+    // If we were running before reload, resume automatically
+    // Wait for state load first
+    setTimeout(() => {
+      if (localStorage.getItem('bot_was_running') === 'true') {
+        if (!running) startBot();
+      }
+    }, 1500); // slight delay to allow backend sync
+
+    // Settings bind
+    function bind() {
+      const start = document.getElementById("btnStart");
+      const pauseBtn = document.getElementById("btnPause");
+      const stop = document.getElementById("btnStop");
+      if (start) start.addEventListener("click", startBot);
+      if (pauseBtn) pauseBtn.addEventListener("click", pauseBot);
+      if (stop) stop.addEventListener("click", stopBot);
+
+      const budget = document.getElementById("initialBudget");
+      if (budget) {
+        budget.value = String(CAPITAL);
+        budget.addEventListener("change", () => {
+          const v = Number(budget.value);
+          if (Number.isFinite(v) && v > 0) {
+            // only allow changing capital when stopped to avoid confusion
+            if (!running) {
+              CAPITAL = v;
+              cash = v;
+              positions = {};
+              trades = [];
+              closedTrades = [];
+              totalFees = 0;
+              log(`Capital reset to $${v.toFixed(2)}`);
+              saveState();
+              updateUI();
+            } else {
+              budget.value = String(CAPITAL);
+            }
+          }
+        });
+      }
+    }
+
+    // Boot
+    (async function init() {
+      await loadState();
+      universe = loadUniverse();
+      // If no prior state, load initial capital from settings
+      try {
+        const s = await idbGet("settings", "app");
+        const cap = Number(s?.value?.initial_capital);
+        const hasSession = (Array.isArray(trades) && trades.length > 0) || (positions && Object.keys(positions).length > 0) || (Array.isArray(closedTrades) && closedTrades.length > 0);
+        if (!hasSession && Number.isFinite(cap) && cap > 0) {
+          CAPITAL = cap;
+          cash = cap;
+          const budgetEl = document.getElementById("initialBudget");
+          if (budgetEl) budgetEl.value = String(CAPITAL);
+        }
+      } catch (_e) { }
+      // Load botCfg + OpenAI enabled into UI
+      try {
+        const s2 = await idbGet("settings", "app");
+        const cfg = s2?.value?.botCfg;
+        if (cfg) { BOTCFG = Object.assign(BOTCFG, cfg); }
+
+        // Restore Live Params
+        if (BOTCFG.useLiveData !== undefined) {
+          const chk = document.getElementById("useLiveData");
+          if (chk) chk.checked = BOTCFG.useLiveData;
+          const keyEl = document.getElementById("finnhubApiKey");
+          if (keyEl && BOTCFG.finnhubKey) keyEl.value = BOTCFG.finnhubKey;
+          const urlEl = document.getElementById("apiBaseUrl");
+          if (urlEl && BOTCFG.apiBaseUrl) urlEl.value = BOTCFG.apiBaseUrl;
+          updateDbgLiveStatus();
+        }
+
+        // populate settings inputs
+        const setVal = (id, val) => { const el = document.getElementById(id); if (el != null && val != null) el.value = String(val); };
+        setVal("riskPct", (BOTCFG.riskPct * 100).toFixed(2));
+        setVal("maxPositions", BOTCFG.maxPositions);
+        setVal("cooldownMins", Math.round(BOTCFG.cooldownMs / 60000));
+        setVal("maxHoldMins", Math.round(BOTCFG.maxHoldMs / 60000));
+        setVal("atrStopX", BOTCFG.atrStopX);
+        setVal("atrTpX", BOTCFG.atrTpX);
+        setVal("edgeBufferPct", (BOTCFG.edgeBufferPct * 100).toFixed(2));
+        setVal("rangeBandPct", (BOTCFG.rangeBandPct * 100).toFixed(2));
+
+        const oa = s2?.value?.openai;
+        const oaEnabled = !!oa?.enabled;
+        const chk = document.getElementById("openaiEnabled");
+        if (chk) chk.checked = oaEnabled;
+      } catch (_e2) { }
+
+
+      // ensure prices exist for universe
+      for (const sym of universe) ensurePrice(sym);
+
+      // Set version in UI
+      document.title = `Smart Trading Bot ${APP_VERSION}`;
+      const vEl = document.getElementById("appVersion");
+      if (vEl) vEl.textContent = APP_VERSION;
+      log(`Initializing ${APP_VERSION}...`, "info");
+
+      bind();
+      updateUI();
+
+      // If it was running previously, restore timers
+      if (running) {
+        if (paused) {
+          log("Restored: bot paused");
+        } else {
+          log("Restored: bot running");
+          startBot();
+        }
+      } else {
+        log("Loaded");
+      }
+    })(); // End init()
+
+    // --- Sparkline ---
+    // Cache sparkline data to avoid spamming backend
+    const sparkCache = {};
+
+    async function drawSparkline(canvasId, sym, avgPrice) {
+      const can = document.getElementById(canvasId);
+      if (!can) return;
+      const ctx = can.getContext("2d");
+      const w = can.width;
+      const h = can.height;
+      ctx.clearRect(0, 0, w, h);
+
+      let data = sparkCache[sym];
+      if (!data || (Date.now() - data.ts > 60000)) { // 1 min cache
+        try {
+          // Use history endpoint but just get last 20 candles for spark
+          const res = await fetch(`${API_URL}/history/${sym}?period=5d&interval=1h`);
+          if (res.ok) {
+            const json = await res.json();
+            // Just closes
+            data = { ts: Date.now(), vals: json.slice(-30).map(d => d.c) };
+            sparkCache[sym] = data;
+          }
+        } catch (e) { }
+      }
+
+      if (!data || !data.vals || data.vals.length < 2) return;
+      const vals = data.vals;
+
+      // Scale
+      let min = Math.min(...vals);
+      let max = Math.max(...vals);
+      if (avgPrice) {
+        min = Math.min(min, avgPrice);
+        max = Math.max(max, avgPrice);
+      }
+      const range = max - min || 1;
+
+      // Pad range slightly so lines don't clip edge
+      const pad = range * 0.1;
+      const sMin = min - pad;
+      const sMax = max + pad;
+      const sRange = sMax - sMin;
+
+      const getX = (i) => (i / (vals.length - 1)) * w;
+      const getY = (v) => h - ((v - sMin) / sRange) * h;
+
+      // Draw Entry Line (if exists)
+      if (avgPrice) {
+        const yE = getY(avgPrice);
+        ctx.beginPath();
+        ctx.moveTo(0, yE);
+        ctx.lineTo(w, yE);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Draw Trend Line
+      ctx.beginPath();
+      for (let i = 0; i < vals.length; i++) {
+        if (i === 0) ctx.moveTo(getX(i), getY(vals[i]));
+        else ctx.lineTo(getX(i), getY(vals[i]));
+      }
+      // Color based on trend relative to avgPrice OR start-vs-end
+      let color = "#fff";
+      if (avgPrice) {
+        color = vals[vals.length - 1] >= avgPrice ? "#00e396" : "#ff4560";
+      } else {
+        color = vals[vals.length - 1] >= vals[0] ? "#00e396" : "#ff4560";
+      }
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // --- Details Modal ---
+    // --- Detailed Charting Logic ---
+    let chartData = [];
+
+    async function showDetails(sym) {
+      const modal = document.getElementById("detailModal");
+      const title = document.getElementById("modalTitle");
+      const chartStat = document.getElementById("chartStat");
+      if (!modal || !title) return;
+
+      const name = getName(sym);
+      title.textContent = `${name} (${sym})`;
+      if (chartStat) chartStat.textContent = "Loading history...";
+      modal.style.display = "flex";
+
+      const ctx = document.getElementById("detailChart").getContext("2d");
+      // Reset canvas
+      ctx.clearRect(0, 0, 600, 300);
+      ctx.fillStyle = "#fff";
+      ctx.font = "14px sans-serif";
+      ctx.fillText("Loading data...", 250, 150);
+
+      try {
+        // Fetch history + indicators from backend
+        // interval=1d is better for daily analysis, or 1h for intraday
+        const res = await fetch(`${API_URL}/history/${sym}?period=1mo&interval=1d`);
+        if (!res.ok) throw new Error("No data available");
+        chartData = await res.json();
+        if (chartStat) chartStat.innerHTML = `${chartData.length} candles (Daily)`;
+
+        drawCandleChart(ctx, chartData, 600, 300);
+
+      } catch (e) {
+        console.error(e);
+        ctx.clearRect(0, 0, 600, 300);
+        ctx.fillStyle = "#ff4560";
+        ctx.fillText("Error loading chart data", 20, 150);
+        ctx.font = "12px sans-serif";
+        ctx.fillText(e.message, 20, 170);
+        if (chartStat) chartStat.textContent = "Error: " + e.message;
+      }
+    }
+
+    function drawCandleChart(ctx, data, w, h) {
+      if (!data.length) return;
+
+      // Layout: Top 70% Price, Bottom 30% MACD
+      const priceH = h * 0.7;
+      const macdH = h * 0.3;
+      const macdY = priceH;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Scale Price
+      let minP = Infinity, maxP = -Infinity;
+      // Scale MACD
+      let minM = Infinity, maxM = -Infinity;
+
+      for (const d of data) {
+        if (d.l < minP) minP = d.l;
+        if (d.h > maxP) maxP = d.h;
+        if (d.hist !== undefined) {
+          if (d.hist < minM) minM = d.hist;
+          if (d.hist > maxM) maxM = d.hist;
+        }
+      }
+      // Buffer
+      const rangeP = maxP - minP || 1;
+      minP -= rangeP * 0.05; maxP += rangeP * 0.05;
+
+      const rangeM = Math.max(Math.abs(minM), Math.abs(maxM)) || 1;
+
+      const candleW = (w / data.length) * 0.7;
+      const gap = (w / data.length) * 0.3;
+
+      const getX = (i) => i * (candleW + gap) + gap;
+      const getY = (v) => priceH - ((v - minP) / (maxP - minP)) * priceH;
+      const getMY = (v) => macdY + (macdH / 2) - (v / rangeM) * (macdH / 2 * 0.8);
+
+      // Draw Candles
+      data.forEach((d, i) => {
+        const x = getX(i);
+        const yO = getY(d.o);
+        const yC = getY(d.c);
+        const yH = getY(d.h);
+        const yL = getY(d.l);
+
+        const isGreen = d.c >= d.o;
+        ctx.fillStyle = isGreen ? "#00e396" : "#ff4560";
+        ctx.strokeStyle = ctx.fillStyle;
+
+        // Wick
+        ctx.beginPath(); ctx.moveTo(x + candleW / 2, yH); ctx.lineTo(x + candleW / 2, yL); ctx.stroke();
+
+        // Body
+        const bodyH = Math.max(1, Math.abs(yC - yO));
+        ctx.fillRect(x, Math.min(yO, yC), candleW, bodyH);
+
+        // SMA Lines
+        if (i > 0 && d.sma20 && data[i - 1].sma20) {
+          ctx.strokeStyle = "#feb019"; // SMA20 Orange
+          ctx.beginPath(); ctx.moveTo(getX(i - 1) + candleW / 2, getY(data[i - 1].sma20)); ctx.lineTo(x + candleW / 2, getY(d.sma20)); ctx.stroke();
+        }
+      });
+
+      // Draw MACD Area
+      const zeroY = macdY + macdH / 2;
+      ctx.strokeStyle = "#444";
+      ctx.beginPath(); ctx.moveTo(0, zeroY); ctx.lineTo(w, zeroY); ctx.stroke();
+
+      data.forEach((d, i) => {
+        if (d.hist !== undefined) {
+          const x = getX(i);
+          const y = getMY(d.hist);
+          const hBar = Math.abs(y - zeroY);
+          const top = Math.min(y, zeroY);
+
+          ctx.fillStyle = d.hist >= 0 ? "rgba(0, 227, 150, 0.5)" : "rgba(255, 69, 96, 0.5)";
+          ctx.fillRect(x, top, candleW, Math.max(1, hBar));
+
+          // Signal Lines
+          if (i > 0 && d.macd && data[i - 1].macd) {
+            ctx.strokeStyle = "#008FFB"; // MACD Blue
+            ctx.beginPath(); ctx.moveTo(getX(i - 1) + candleW / 2, getMY(data[i - 1].macd)); ctx.lineTo(x + candleW / 2, getMY(d.macd)); ctx.stroke();
+          }
+        }
+      });
+
+      // Text Overlays
+      ctx.fillStyle = "#fff";
+      ctx.font = "10px sans-serif";
+      ctx.fillText(`Max: ${fmtMoney(maxP)}`, w - 60, 15);
+      ctx.fillText(`Min: ${fmtMoney(minP)}`, w - 60, priceH - 5);
+      ctx.fillStyle = "#feb019"; ctx.fillText("SMA20", 5, 15);
+      ctx.fillStyle = "#008FFB"; ctx.fillText("MACD", 5, macdY + 15);
+    }
+
+    function closeDetails() {
+      const modal = document.getElementById("detailModal");
+      if (modal) modal.style.display = "none";
+    }
+
+    // Expose for HTML onclick
+    window.closeDetails = closeDetails;
+  </script>
+
+  <!-- Detail Modal Overlay -->
+  <div id="detailModal"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center;">
+    <div
+      style="background:#1f2647; width:90%; max-width:640px; border-radius:12px; padding:20px; border:1px solid #667eea;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 id="modalTitle" style="margin:0; font-size:24px;">Symbol</h2>
+        <button onclick="closeDetails()"
+          style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">&times;</button>
+      </div>
+      <canvas id="detailChart" width="600" height="300"
+        style="width:100%; background:#131722; border-radius:8px;"></canvas>
+      <div style="margin-top:10px; font-size:12px; color:#888;">
+        Analysis provided by Python Backend
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

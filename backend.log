@@ -1,0 +1,56 @@
+INFO:     Will watch for changes in these directories: ['/Users/garethboothby/Trade']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [71465] using StatReload
+INFO:     Started server process [71498]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+Error fetching candles AAPL: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61017 - "GET /history/AAPL?period=5d&interval=1h HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61052 - "OPTIONS /record_trade HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61054 - "OPTIONS /record_trade HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61055 - "OPTIONS /record_trade HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61057 - "OPTIONS /sync_positions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61059 - "OPTIONS /sync_positions HTTP/1.1" 200 OK
+Error fetching candles SNPS: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61061 - "GET /history/SNPS?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles AAPL: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61052 - "GET /history/AAPL?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles BNB-USD: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61054 - "GET /history/BNB-USD?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles XOM: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61055 - "GET /history/XOM?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles TRX-USD: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61057 - "GET /history/TRX-USD?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles DOGE-USD: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61059 - "GET /history/DOGE-USD?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles TXN: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61061 - "GET /history/TXN?period=5d&interval=1h HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61042 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61052 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61044 - "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 Not Found
+Error fetching candles SNPS: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61052 - "GET /history/SNPS?period=5d&interval=1h HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61055 - "POST /record_trade HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61061 - "POST /sync_positions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61057 - "POST /record_trade HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61059 - "POST /sync_positions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61054 - "POST /record_trade HTTP/1.1" 200 OK
+Error fetching candles AAPL: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61055 - "GET /history/AAPL?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles XOM: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61061 - "GET /history/XOM?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles TRX-USD: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61057 - "GET /history/TRX-USD?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles DOGE-USD: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61059 - "GET /history/DOGE-USD?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles AGG: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61042 - "GET /history/AGG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles BBY: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61044 - "GET /history/BBY?period=5d&interval=1h HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61052 - "OPTIONS /sync_positions HTTP/1.1" 200 OK
+Error fetching candles VWO: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61042 - "GET /history/VWO?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles MRVL: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61155 - "GET /history/MRVL?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RSG: Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:61157 - "GET /history/RSG?period=5d&interval=1h HTTP/1.1" 404 Not Found

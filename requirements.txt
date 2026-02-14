@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+sqlalchemy
+pandas
+yfinance
+ccxt
+python-multipart
+# optional for later
+# pandas_ta
+pandas_ta
