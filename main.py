@@ -82,7 +82,7 @@ async def get_history(symbol: str, period: str = "1mo", interval: str = "1h"):
     
     df = await market_data.get_stock_candles(symbol, period=period, interval=interval)
     if df.empty:
-        raise HTTPException(status_code=404, detail="No data found")
+        return []  # Return empty array instead of 404 to avoid console error spam
     
     # Calculate Indicators
     try:

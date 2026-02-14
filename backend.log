@@ -285,3 +285,16 @@ INFO:     127.0.0.1:52361 - "GET /history/VEA?period=5d&interval=1h HTTP/1.1" 40
 Error fetching candles RTX (attempt 1): Too Many Requests. Rate limited. Try after a while.
 Error fetching candles CRM (attempt 3): Too Many Requests. Rate limited. Try after a while.
 INFO:     127.0.0.1:52350 - "GET /history/CRM?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles XLF (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RSG (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles XLF (attempt 1): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles RTX (attempt 2): Too Many Requests. Rate limited. Try after a while.
+Error fetching candles XLF (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52337 - "GET /history/XLF?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles RSG (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52358 - "GET /history/RSG?period=5d&interval=1h HTTP/1.1" 404 Not Found
+Error fetching candles XLF (attempt 2): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52359 - "GET / HTTP/1.1" 200 OK
+Error fetching candles RTX (attempt 3): Too Many Requests. Rate limited. Try after a while.
+INFO:     127.0.0.1:52362 - "GET /history/RTX?period=5d&interval=1h HTTP/1.1" 404 Not Found
+WARNING:  StatReload detected changes in 'main.py'. Reloading...
